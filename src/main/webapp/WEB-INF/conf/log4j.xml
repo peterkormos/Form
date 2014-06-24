@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+  <appender name="ASYNC_MSZPollsServlet" class="org.apache.log4j.AsyncAppender">
+    <appender-ref ref="FILE_MSZPollsServlet"/>
+  </appender>
+
+  <appender name="FILE_MSZPollsServlet" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="MSZPollsServlet.log"/>
+    <param name="MaxFileSize" value="100MB"/>
+    <param name="MaxBackupIndex" value="5"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="[%d{ISO8601}] - %m%n" />
+    </layout>
+  </appender>
+
+
+  <logger name="org.msz.servlet.MSZPollsServlet">
+        <level value="TRACE" />
+    <appender-ref ref="ASYNC_MSZPollsServlet"/>
+  </logger>
+    
+</log4j:configuration>

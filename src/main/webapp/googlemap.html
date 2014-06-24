@@ -1,0 +1,94 @@
+<html>
+<head>
+
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAqev4fRnaiSo-XtAyyOdatRRO9qeUkRN7-Fvh2OLBEjwyQcLANhQ0UxuTtSFlxaQksGU210KhsRdkoA"  type="text/javascript">
+</script>
+
+<xscript src="http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js"  type="text/javascript">
+</xscript>
+
+<script type="text/javascript">
+
+var map = null;
+var geocoder = null;
+var mgr = null;
+
+function initialize() 
+{
+ 	if (GBrowserIsCompatible()) 
+ 	{
+		map = new GMap2(document.getElementById("map_canvas"));
+		map.setCenter(new GLatLng(47.323931, 19.094238), 7);
+	    map.setUIToDefault();
+
+//		mgr = new MarkerManager(map, {trackMarkers: true});
+
+		geocoder = new GClientGeocoder();
+		
+		GEvent.addListener(map, "click", function(overlay, latlng) 
+		{
+			addMarker(latlng);
+		});		
+	}
+}
+
+function showAddress(address) 
+{	
+	geocoder.getLatLng(
+    	address,
+    	function(latlng) 
+	{
+      		if (!latlng) 
+        		alert(address + " c&iacute;m nem tal&aacute;lhat&oacute;!");
+      		else 
+				addMarker(latlng);
+    });
+}
+
+function addMarker(latlng) 
+{
+	 	map.clearOverlays();
+
+		map.setZoom(13);
+  		map.panTo(latlng);
+   		var marker = new GMarker(latlng, {draggable: true, bouncy:true});
+        map.addOverlay(marker);
+//			mgr.addMarker(marker, map.getZoom());
+//		if(info != '')
+//	   		marker.openInfoWindowHtml(info);
+			
+		document.getElementById("pointLat").value = latlng.lat();
+		document.getElementById("pointLng").value = latlng.lng();
+}
+
+function checkData()
+{
+	var submitAllowed = document.getElementById("pointLat").value != '';
+	
+	if(!submitAllowed)
+		alert('Valassz egy pontot mielott mentenel a szerverre!');
+	else
+		alert(document.getElementById("pointLat").value  +  ' ' +
+			document.getElementById("pointLng").value);
+		
+	return document.getElementById("pointLat").value != '';
+	
+}
+    </script>
+  </head>
+
+  <body onload="initialize()" onunload="GUnload()">
+  
+<form action="" onSubmit="return  checkData();">
+  <p> <strong>Add meg a felvivend&otilde; pont c&iacute;m&eacute;t, vagy kattints 
+    a t&eacute;rk&eacute;pre....</strong></p>
+  <p> C&iacute;m: 
+    <input type="text" size="60" name="address"  onChange="showAddress(address.value);"/>
+    <input type="hidden" name="lat" id="pointLat" />
+    <input type="hidden" name="lng" id="pointLng"/>
+  </p>
+       
+  <div id="map_canvas" style="width: 400px; height: 300px"></div>
+     </form>
+  </body>
+</html>

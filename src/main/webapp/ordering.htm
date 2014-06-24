@@ -1,0 +1,97 @@
+
+<!-- saved from url=(0048)http://localhost:8080/MSZ_Szavazas/inputVote.jsp -->
+<html>
+<head>
+
+<script type="text/javascript">
+function moveUp(currentDiv)
+{
+	var parentDiv = document.getElementById("containerDiv");
+	
+	if(currentDiv.id > 1)
+	{
+		var next = document.getElementById(parseInt(currentDiv.id)-1);
+		parentDiv.insertBefore(currentDiv, next);
+	}
+	
+	reindex(parentDiv);
+}
+
+function moveDown(currentDiv)
+{
+	var parentDiv = document.getElementById("containerDiv");
+	
+	if(currentDiv.id < parentDiv.childNodes.length)
+	{
+		var next = document.getElementById(parseInt(currentDiv.id)+2);
+		parentDiv.insertBefore(currentDiv, next);
+		
+	}
+	reindex(parentDiv);
+}
+
+function reindex(parentDiv)
+{
+	for( i = 0; i < parentDiv.childNodes.length; i++)
+	{
+		parentDiv.childNodes[i].id = i+1;
+		var childs = parentDiv.childNodes[i].childNodes;
+//				alert(childs + " " + childs.length);
+		for( j = 0; j < childs.length; j++)
+		{
+			if(childs[j].name == null)
+				continue;			
+//*	
+		if(childs[j].name.indexOf("optionName") != -1)
+			{
+				childs[j].name = "optionName"+(i+1);
+			}
+			if(childs[j].name.indexOf("optionValue") != -1)
+			{
+				childs[j].name = "optionValue"+(i+1);
+			}
+//*/			
+		}
+	}
+}
+
+</script>
+
+</head><body>
+<script type="text/javascript">
+//alert("optionValue1".indexOf("optionValue"));
+
+</script>
+
+<p>
+<div id="containerDiv">
+<div id="1">
+	a 
+	<input type="hidden" name="optionName1" value="a">
+	
+  <input name="optionValue1" type="text" value="av" >
+	<input type="submit" name="Submit" value="^" onClick="moveUp(this.parentNode)">
+	<input type="submit" name="Submit" value="v" onClick="moveDown(this.parentNode)">
+</div>
+
+<div id="2">
+	b
+	<input type="hidden" name="optionName2" value="b">
+	
+  <input name="optionValue2" type="text" value="bv" >
+	<input type="submit" name="Submit" value="^" onClick="moveUp(this.parentNode)">
+	<input type="submit" name="Submit" value="v" onClick="moveDown(this.parentNode)">
+</div>
+
+	<div id="3">
+	  c 
+        <input type="hidden" name="optionName3" value="c">
+        <input name="optionValue3" type="text" value="cv" >
+        <input type="submit" name="Submit" value="^" onClick="moveUp(this.parentNode)">
+        <input type="submit" name="Submit" value="v" onClick="moveDown(this.parentNode)">
+    </div>
+	
+</div>
+<form>
+</form>
+</body></html>
