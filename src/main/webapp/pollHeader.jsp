@@ -9,7 +9,7 @@
 <%@include file="util.jsp" %>
 
 <%
-  MSZPollsServletDAO dao = new MSZPollsServletDAO("");
+  MSZPollsServletDAO dao = new MSZPollsServletDAO(null);
 
   int pollID = Integer.parseInt(WebUtils.getParameter(request, MSZPollsServlet.POLL_ID));
   

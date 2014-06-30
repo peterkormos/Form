@@ -23,17 +23,17 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.msz.datatype.Record;
-import org.msz.servlet.datatype.AwardingPoll;
 import org.msz.servlet.datatype.OptionsBag;
 import org.msz.servlet.datatype.Poll;
 import org.msz.servlet.datatype.PollGroup;
 import org.msz.servlet.datatype.PollOption;
 import org.msz.servlet.datatype.PublicPoll;
-import org.msz.servlet.datatype.SplitPointsPoll;
 import org.msz.servlet.datatype.Subscription;
 import org.msz.servlet.datatype.User;
 import org.msz.servlet.datatype.Vote;
 import org.msz.servlet.datatype.VoteOption;
+import org.msz.servlet.datatype.polls.AwardingPoll;
+import org.msz.servlet.datatype.polls.SplitPointsPoll;
 import org.msz.servlet.util.MSZPollsServletDAO;
 import org.msz.util.Utils;
 import org.msz.util.WebUtils;
@@ -114,9 +114,10 @@ public class MSZPollsServlet extends HttpServlet
     try
     {
       logger = Logger.getLogger(getClass());
-      DOMConfigurator.configure(config.getServletContext().getRealPath(
-          "/WEB-INF/")
-          + File.separator + "conf/log4j.xml");
+      
+      
+      
+      DOMConfigurator.configure(config.getServletContext().getResource("/WEB-INF/conf/log4j.xml"));
       logger
           .fatal("************************ Logging restarted ************************");
 
@@ -124,21 +125,15 @@ public class MSZPollsServlet extends HttpServlet
       webUtils = new WebUtils(logger);
 
       servletConfig = new Properties();
-      servletConfig.load(new FileInputStream(config.getServletContext()
-          .getRealPath("/WEB-INF/")
-          + File.separator + "conf/servletConfig.ini"));
+      servletConfig.load(config.getServletContext().getResourceAsStream("/WEB-INF/conf/servletConfig.ini"));
 
       messages = new Properties();
-      messages.load(new FileInputStream(config.getServletContext().getRealPath(
-          "/WEB-INF/")
-          + File.separator + "conf/messages.html"));
+      messages.load(config.getServletContext().getResourceAsStream("/WEB-INF/conf/messages.html"));
 
-      emailBody = utils.loadFile(
-          config.getServletContext().getRealPath("/WEB-INF/") + File.separator
-              + "conf/emailBody.html").toString();
-      dao = new MSZPollsServletDAO(config.getServletContext().getRealPath(
-          "/WEB-INF/")
-          + File.separator + "conf/hibernate.cfg.xml");
+      emailBody = utils.loadFile(config.getServletContext().getResourceAsStream("/WEB-INF/conf/emailBody.html")).toString();
+      
+      dao = new MSZPollsServletDAO(
+    	  config.getServletContext().getResource("/WEB-INF/conf/hibernate.cfg.xml"));
     }
     catch (Exception e)
     {
@@ -821,7 +816,8 @@ public class MSZPollsServlet extends HttpServlet
         servletConfig.getProperty("email.from"), ((User) dao.get(userID,
             User.class)).emailAddress, servletConfig
             .getProperty("email.subject") + subject, message, Boolean
-            .parseBoolean(servletConfig.getProperty("email.debugSMTP")));
+            .parseBoolean(servletConfig.getProperty("email.debugSMTP")),
+            servletConfig.getProperty("email.password"));
   }
 
   private void assignPoll(HttpServletRequest request,

@@ -9,8 +9,8 @@ import org.msz.servlet.datatype.Poll;
 import org.msz.servlet.datatype.PollGroup;
 import org.msz.servlet.datatype.PollOption;
 import org.msz.servlet.datatype.PublicPoll;
-import org.msz.servlet.datatype.SingleDecisionPoll;
 import org.msz.servlet.datatype.User;
+import org.msz.servlet.datatype.polls.SingleDecisionPoll;
 
 public class testbed
 {
@@ -25,7 +25,7 @@ public class testbed
 	getYesNoImage(true));
 	
 	
-	MSZPollsServletDAO dao = new MSZPollsServletDAO(TestDAO.hibernateConfig);
+//	PollsServletDAO dao = new PollsServletDAO(TestDAO.hibernateConfig);
 
 	//	Poll poll = (Poll)dao.get(1, Poll.class);	
 	//	System.out.println(poll.owner);
@@ -54,13 +54,13 @@ public class testbed
 	//	Collection<Record> users = (Collection<Record>) (null == null ? dao.getAll(User.class) :
 	//	  dao.getUsersInGroup(1));
 
-	System.out.println(dao.get(2, User.class)
+//	System.out.println(dao.get(2, User.class)
 	//	    users
 	//	    dao.getVote(1, 4)
 	//	  dao.getPolls()
 	//	  dao.getVotes(1)
 	//	    dao.getUsersInGroup(1)
 	//	    dao.get(1, PollGroup.class)
-	    );
+//	    );
   }
 }

@@ -1,5 +1,6 @@
 package org.msz.servlet.util;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -9,7 +10,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.msz.datatype.Record;
-import org.msz.servlet.MSZPollsServlet;
+import org.msz.servlet.PollsServlet;
 import org.msz.servlet.datatype.Poll;
 import org.msz.servlet.datatype.PollGroup;
 import org.msz.servlet.datatype.PublicPoll;
@@ -20,9 +21,9 @@ import org.msz.util.HibernateDAO;
 
 public class MSZPollsServletDAO extends HibernateDAO
 {
-  public MSZPollsServletDAO(String configFile)
+  public MSZPollsServletDAO(URL hibernateConfig)
   {
-    super(configFile);
+    super(hibernateConfig);
   }
 
   public Vote getVote(int userID, int pollID) throws Exception
@@ -186,7 +187,7 @@ public class MSZPollsServletDAO extends HibernateDAO
       session.beginTransaction();
 
       User user = null;
-      if (MSZPollsServlet.NO_PASSWORD.equals(password))
+      if (PollsServlet.NO_PASSWORD.equals(password))
         user = (User) session.createQuery("From User where emailAddress = ?")
             .setString(0, emailAddress).uniqueResult();
       else
@@ -195,7 +196,7 @@ public class MSZPollsServletDAO extends HibernateDAO
             emailAddress).setString(1, password).uniqueResult();
 
       if (user == null)
-        throw new Exception(MSZPollsServlet.messages
+        throw new Exception(PollsServlet.messages
             .getProperty("user.not.found"));
       return user;
     }

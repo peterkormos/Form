@@ -1,6 +1,7 @@
 package org.msz.util;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -19,13 +20,13 @@ import org.msz.servlet.datatype.Vote;
 public class HibernateDAO
 {
   private static SessionFactory sessionFactory;
-  private String configFile;
+  private URL configFile;
 
   protected Session getHibernateSession()
   {
     if (sessionFactory == null)
       sessionFactory = new AnnotationConfiguration().configure(
-          new File(configFile)).buildSessionFactory();
+          configFile).buildSessionFactory();
 
     return sessionFactory.getCurrentSession();
   }
@@ -38,7 +39,7 @@ public class HibernateDAO
     }
   }
 
-  public HibernateDAO(String configFile)
+  public HibernateDAO(URL configFile)
   {
     this.configFile = configFile;
   }

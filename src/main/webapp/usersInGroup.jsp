@@ -7,7 +7,7 @@
 <%@page import="java.io.File"%>
 
 <%
-  MSZPollsServletDAO dao = new MSZPollsServletDAO("");
+  MSZPollsServletDAO dao = new MSZPollsServletDAO(null);
 %>
 
 

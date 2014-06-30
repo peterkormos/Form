@@ -18,7 +18,7 @@ function sendSubmit(currentNode, command)
 </head>
 <body>
 <%
-  MSZPollsServletDAO dao = new MSZPollsServletDAO("");
+  MSZPollsServletDAO dao = new MSZPollsServletDAO(null);
   int userID = Integer.parseInt((String) session
       .getAttribute(MSZPollsServlet.USER_ID));
   User user = (User) dao.get(userID, User.class);

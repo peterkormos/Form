@@ -13,7 +13,7 @@
 </head>
 <body>
 <%
-    MSZPollsServletDAO dao = new MSZPollsServletDAO("");
+    MSZPollsServletDAO dao = new MSZPollsServletDAO(null);
 
     Set<Record> polls = (Set<Record>) dao.getAll(Poll.class);
 %>

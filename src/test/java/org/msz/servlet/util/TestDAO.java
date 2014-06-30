@@ -10,27 +10,29 @@ import java.util.TreeSet;
 
 import javax.persistence.OrderColumn;
 
-import junit.framework.TestCase;
+import junit.framework.*;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.msz.servlet.datatype.PollGroup;
 import org.msz.servlet.datatype.PollOption;
 import org.msz.servlet.datatype.Poll;
-import org.msz.servlet.datatype.SingleDecisionPoll;
 import org.msz.servlet.datatype.User;
 import org.msz.servlet.datatype.Vote;
 import org.msz.servlet.datatype.VoteOption;
+import org.msz.servlet.datatype.polls.SingleDecisionPoll;
 
+@Ignore
 public class TestDAO extends TestCase
 {
     public static String hibernateConfig = 
 //	"/Dev/javaprojects/MSZ_Szavazas/WebContent/WEB-INF/conf/hibernate.cfg.xml"
-     "src/test/resources/hibernate.cfg.xml"
+     "/hibernate.cfg.xml"
     ;
 
     public void xtestUser() throws Exception
     {
-	MSZPollsServletDAO dao = new MSZPollsServletDAO(hibernateConfig);
+	PollsServletDAO dao = new PollsServletDAO(getClass().getResource(hibernateConfig));
 
 	int userID = dao.getNextID(User.class);
 
@@ -72,7 +74,7 @@ public class TestDAO extends TestCase
 
     public void xtestOption() throws Exception
     {
-	MSZPollsServletDAO dao = new MSZPollsServletDAO(hibernateConfig);
+	PollsServletDAO dao = new PollsServletDAO(getClass().getResource(hibernateConfig));
 
 	int id = dao.getNextID(PollOption.class);
 
@@ -109,7 +111,7 @@ public class TestDAO extends TestCase
 
     public void xtestPoll() throws Exception
     {
-	MSZPollsServletDAO dao = new MSZPollsServletDAO(hibernateConfig);
+	PollsServletDAO dao = new PollsServletDAO(getClass().getResource(hibernateConfig));
 
 	int id = dao.getNextID(Poll.class);
 
@@ -170,7 +172,7 @@ public class TestDAO extends TestCase
 
     public void xtestVote() throws Exception
     {
-	MSZPollsServletDAO dao = new MSZPollsServletDAO(hibernateConfig);
+	PollsServletDAO dao = new PollsServletDAO(getClass().getResource(hibernateConfig));
 
 	int id = dao.getNextID(Vote.class);
 
@@ -243,7 +245,7 @@ public class TestDAO extends TestCase
 
     public void testSingleDecisionPoll() throws Exception
     {
-	MSZPollsServletDAO dao = new MSZPollsServletDAO(hibernateConfig);
+	PollsServletDAO dao = new PollsServletDAO(getClass().getResource(hibernateConfig));
 
 	int id = dao.getNextID(SingleDecisionPoll.class);
 

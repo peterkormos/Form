@@ -8,7 +8,7 @@
 <%@page import="org.msz.util.WebUtils"%>
 
 <%
-  MSZPollsServletDAO dao = new MSZPollsServletDAO("");
+  MSZPollsServletDAO dao = new MSZPollsServletDAO(null);
   int userID = Integer.parseInt(WebUtils.getParameter(request,
       MSZPollsServlet.USER_ID));
   User user = (User) dao.get(userID, User.class);

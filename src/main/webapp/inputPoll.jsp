@@ -42,7 +42,7 @@ function addRow()
 </head>
 <body>
 <%
-  MSZPollsServletDAO dao = new MSZPollsServletDAO("");
+  MSZPollsServletDAO dao = new MSZPollsServletDAO(null);
   String pollID = WebUtils.getOptionalParameter(request,
       MSZPollsServlet.POLL_ID);
 

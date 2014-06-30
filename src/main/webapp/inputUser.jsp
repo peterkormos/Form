@@ -10,7 +10,7 @@
 					MSZPollsServlet.USER_ID);
 			User user = null;
 			if (userID != null) {
-				MSZPollsServletDAO dao = new MSZPollsServletDAO("");
+				MSZPollsServletDAO dao = new MSZPollsServletDAO(null);
 				user = (User) dao.get(Integer.parseInt(userID), User.class);
 			}
 %>

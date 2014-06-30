@@ -28,7 +28,7 @@ function addRow()
 	type="hidden" name="<%=MSZPollsServlet.COMMAND %>"
 	value="<%=MSZPollsServlet.COMMAND_ADD_OPTION %>"> <input
 	type="hidden" name="rows" value="0"> <%
-     MSZPollsServletDAO dao = new MSZPollsServletDAO("");
+     MSZPollsServletDAO dao = new MSZPollsServletDAO(null);
      Poll poll = (Poll) dao.get(Integer.parseInt((String) session
  		    .getAttribute(MSZPollsServlet.POLL_ID)), Poll.class);
  %>
