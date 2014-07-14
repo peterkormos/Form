@@ -7,7 +7,7 @@
 <%@page import="java.io.File"%>
 
 <%
-  PollsServletDAO dao = new PollsServletDAO(null);
+  PollsServletDAO dao = PollsServletDAO.getInstance();
 //  int userID = Integer.parseInt((String) session
 //      .getAttribute(PollsServlet.USER_ID));
 //  User user = (User) dao.get(userID, User.class);
@@ -44,7 +44,7 @@ function initialize()
 //		mgr = new MarkerManager(map, {trackMarkers: true});
 
 <%
-String pollGroupID = WebUtils.getOptionalParameter(request, PollsServlet.POLL_GROUP_ID);
+String pollGroupID = WebUtils.getOptionalParameter(request, HTTPRequestParamNames.POLL_GROUP_ID);
 
 if(pollGroupID == null )
           for(Record record : dao.getAll(User.class))
@@ -76,7 +76,7 @@ function addMarker(latlng, info)
 		if(info != '')
 			GEvent.addListener(marker, "click", function(overlay, latlng) 
 			{
-	   			marker.openInfoWindowHtml(info);
+	   			marker.openInfoWindowHtml(info, { maxWidth:400});
 			});		
 }
 

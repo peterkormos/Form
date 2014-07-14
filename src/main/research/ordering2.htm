@@ -72,42 +72,39 @@ function reindex(parentDiv)
 
 </script>
 
-</head><body>
-<p>
-<form method="get" action="">
-<div id="containerDiv">
-<div id="1">
-	a 
-	<input type="hidden" name="optionName1" value="a">
-	
-      <input name="optionValue1" type="text"  readonly="readonly" size="4" >
-	<input type="button"  value="^" onClick="moveUp(this.parentNode)">
-	<input type="button"  value="v" onClick="moveDown(this.parentNode)">
-</div>
+</head>
+<body>
+	<p>
+	<form method="get" action="">
+		<div id="containerDiv">
+			<div id="1">
+				a <input type="hidden" name="optionName1" value="a"> <input
+					name="optionValue1" type="text" readonly="readonly" size="4">
+				<input type="button" value="^" onClick="moveUp(this.parentNode)">
+				<input type="button" value="v" onClick="moveDown(this.parentNode)">
+			</div>
 
-<div id="2">
-	b
-	<input type="hidden" name="optionName2" value="b">
-	
-  <input name="optionValue2" type="text"  >
-	<input type="button"  value="^" onClick="moveUp(this.parentNode)">
-	<input type="button"  value="v" onClick="moveDown(this.parentNode)">
-</div>
+			<div id="2">
+				b <input type="hidden" name="optionName2" value="b"> <input
+					name="optionValue2" type="text"> <input type="button"
+					value="^" onClick="moveUp(this.parentNode)"> <input
+					type="button" value="v" onClick="moveDown(this.parentNode)">
+			</div>
 
-	<div id="3">
-	  c 
-        <input type="hidden" name="optionName3" value="c">
-        <input name="optionValue3" type="text" >
-        <input type="button"  value="^" onClick="moveUp(this.parentNode)">
-        <input type="button"  value="v" onClick="moveDown(this.parentNode)">
-    </div>
-	
-</div>
+			<div id="3">
+				c <input type="hidden" name="optionName3" value="c"> <input
+					name="optionValue3" type="text"> <input type="button"
+					value="^" onClick="moveUp(this.parentNode)"> <input
+					type="button" value="v" onClick="moveDown(this.parentNode)">
+			</div>
 
-<script type="text/javascript">
+		</div>
+
+		<script type="text/javascript">
 //alert(document.getElementById("containerDiv").getElementsByTagName("div").length);
 </script>
 
-<input type="submit">
-</form>
-</body></html>
+		<input type="submit">
+	</form>
+</body>
+</html>

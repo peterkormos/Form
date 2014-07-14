@@ -1,11 +1,13 @@
 package org.msz.datatype;
 
-import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
-import javax.persistence.*;
+import org.msz.servlet.datatype.User;
 
 @MappedSuperclass
-public class Record implements Serializable, Comparable
+public class Record implements Comparable<Record>
 {
   @Id
   @Column(name = "record_id")
@@ -44,9 +46,8 @@ public class Record implements Serializable, Comparable
   }
 
   @Override
-  public int compareTo(Object o)
+  public int compareTo(Record o)
   {
-    return new Integer(id).compareTo(((Record)o).id);
+    return new Integer(id).compareTo(o.id);
   }
-
 }

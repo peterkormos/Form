@@ -13,7 +13,7 @@ import org.msz.servlet.datatype.PollGroup;
 @PrimaryKeyJoinColumn(name = "poll_id")
 public class SplitPointsPoll extends Poll
 {
-    @Column(name = "poll_id", insertable = false, updatable = false)
+    @Column(name = "poll_id", insertable = false, updatable = false, nullable = false)
     public int pollID;
 
     @Column(name = "units")

@@ -1,12 +1,9 @@
 package org.msz.servlet.datatype.polls;
 
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-import javax.servlet.http.HttpServletRequest;
 
 import org.msz.servlet.datatype.Poll;
 import org.msz.servlet.datatype.PollGroup;
@@ -16,7 +13,7 @@ import org.msz.servlet.datatype.PollGroup;
 @PrimaryKeyJoinColumn(name = "poll_id")
 public class MultiDecisionPoll extends Poll
 {
-    @Column(name = "poll_id", insertable=false, updatable=false)
+    @Column(name = "poll_id", insertable=false, updatable=false, nullable = false)
     public int pollID;
 
     public MultiDecisionPoll()

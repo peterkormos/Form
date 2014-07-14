@@ -1,16 +1,14 @@
-package org.msz.servlet.datatype;
+package org.msz.servlet.datatype.polls;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import org.msz.datatype.Record;
+import org.msz.servlet.datatype.Poll;
 
 @Entity
 @Table(name = "poll_public_polls")

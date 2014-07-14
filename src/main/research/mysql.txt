@@ -1,11 +1,27 @@
-DROP TABLE IF EXISTS `poll_vote`;
+DROP TABLE poll_vote;
+DROP TABLE poll_vote_option;
+DROP TABLE poll_user;
+DROP TABLE poll_user_role;
+DROP TABLE poll_binding;
+DROP TABLE poll_poll_option;
+DROP TABLE poll_poll;
+DROP TABLE poll_single_decision_poll;
+DROP TABLE poll_multi_decision_poll;
+DROP TABLE poll_split_points_poll;
+DROP TABLE poll_ordering_poll;
+DROP TABLE poll_awarding_poll;
+DROP TABLE poll_form_type_poll;
+DROP TABLE poll_custom_poll;
+DROP TABLE poll_group;
+DROP TABLE poll_public_polls;
+DROP TABLE poll_subscription;
+
 create table poll_vote (
     record_id int primary key, 
     user_id int not null, 
     poll_id int not null   
 );
 
-DROP TABLE IF EXISTS `poll_vote_option`;
 create table poll_vote_option (
     record_id int primary key, 
     vote_id int,
@@ -14,7 +30,6 @@ create table poll_vote_option (
 );
 
     
-DROP TABLE IF EXISTS `poll_user`;
 create table poll_user (
     record_id int primary key, 
     email_address VARCHAR(500) not null, 
@@ -26,14 +41,12 @@ user_address_lng double default 0
 
 );
     
-DROP TABLE IF EXISTS `poll_binding`;
 create table poll_binding (
     user_id int not null, 
     group_id int not null
 );
 
 
-DROP TABLE IF EXISTS `poll_poll_option`;
 create table poll_poll_option (
     record_id int primary key, 
     poll_id int,
@@ -42,7 +55,6 @@ create table poll_poll_option (
     option_type  VARCHAR(500)
 );
 
-DROP TABLE IF EXISTS `poll_poll`;
 create table poll_poll (
     record_id int primary key, 
     title VARCHAR(500) not null, 
@@ -54,45 +66,37 @@ create table poll_poll (
     group_id int not null 
     );
 
-DROP TABLE IF EXISTS `poll_single_decision_poll`;
 create table poll_single_decision_poll (
     poll_id int primary key
 );
 
-DROP TABLE IF EXISTS `poll_multi_decision_poll`;
 create table poll_multi_decision_poll (
     poll_id int primary key
 );
 
-DROP TABLE IF EXISTS `poll_split_points_poll`;
 create table poll_split_points_poll (
     poll_id int primary key,
     units VARCHAR(500),
     maxAmount VARCHAR(500)
 );
 
-DROP TABLE IF EXISTS `poll_ordering_poll`;
 create table poll_ordering_poll (
     poll_id int primary key);
 
-DROP TABLE IF EXISTS `poll_awarding_poll`;
 create table poll_awarding_poll (
     poll_id int primary key,
     maxAmount VARCHAR(500)
 );
 
-DROP TABLE IF EXISTS `poll_form_type_poll`;
 create table poll_form_type_poll (
     poll_id int primary key
 );
 
-DROP TABLE IF EXISTS `poll_custom_poll`;
 create table poll_custom_poll (
     poll_id int primary key
 );
 
 
-DROP TABLE IF EXISTS `poll_group`;
 create table poll_group (
 	record_id int primary key, 
     name VARCHAR(500), 
@@ -100,13 +104,11 @@ create table poll_group (
 );
 
 
-DROP TABLE IF EXISTS `poll_public_polls`;
 create table poll_public_polls (
 	record_id int primary key, 
     poll_id int 
 );
 
-DROP TABLE IF EXISTS `poll_subscription`;
 create table poll_subscription (
     record_id int primary key, 
     user_id int not null, 

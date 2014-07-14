@@ -1,11 +1,10 @@
 <html>
 <head>
 
-<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAqev4fRnaiSo-XtAyyOdatRRO9qeUkRN7-Fvh2OLBEjwyQcLANhQ0UxuTtSFlxaQksGU210KhsRdkoA"  type="text/javascript">
+<script
+	src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAqev4fRnaiSo-XtAyyOdatRRO9qeUkRN7-Fvh2OLBEjwyQcLANhQ0UxuTtSFlxaQksGU210KhsRdkoA"
+	type="text/javascript">
 </script>
-
-<xscript src="http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js"  type="text/javascript">
-</xscript>
 
 <script type="text/javascript">
 
@@ -75,20 +74,23 @@ function checkData()
 	
 }
     </script>
-  </head>
+</head>
 
-  <body onload="initialize()" onunload="GUnload()">
-  
-<form action="" onSubmit="return  checkData();">
-  <p> <strong>Add meg a felvivend&otilde; pont c&iacute;m&eacute;t, vagy kattints 
-    a t&eacute;rk&eacute;pre....</strong></p>
-  <p> C&iacute;m: 
-    <input type="text" size="60" name="address"  onChange="showAddress(address.value);"/>
-    <input type="hidden" name="lat" id="pointLat" />
-    <input type="hidden" name="lng" id="pointLng"/>
-  </p>
-       
-  <div id="map_canvas" style="width: 400px; height: 300px"></div>
-     </form>
-  </body>
+<body onload="initialize()" onunload="GUnload()">
+
+	<form action="" onSubmit="return  checkData();">
+		<p>
+			<strong>Add meg a felvivend&otilde; pont
+				c&iacute;m&eacute;t, vagy kattints a t&eacute;rk&eacute;pre....</strong>
+		</p>
+		<p>
+			C&iacute;m: <input type="text" size="60" name="address"
+				onChange="showAddress(address.value);" /> <input type="hidden"
+				name="lat" id="pointLat" /> <input type="hidden" name="lng"
+				id="pointLng" />
+		</p>
+
+		<div id="map_canvas" style="width: 400px; height: 300px"></div>
+	</form>
+</body>
 </html>

@@ -4,31 +4,31 @@
 <%@page import="org.msz.util.WebUtils"%>
 <%@page import="java.util.List"%>
 
-<%@include file="util.jsp" %>
+<%@include file="util.jsp"%>
 
 <tr>
 	<td>V&aacute;laszok:</td>
 	<td>
-	<table width="100%" border="1">
-		<tr>
-			<td>
-			<table width="100%" border="0">
-				<tr>
-					<th>
-					<div align="left">Szavaz&oacute;</div>
-					</th>
-					<th>
-					<div align="left">Lehet&otilde;s&eacute;g</div>
-					</th>
-					<th>
-					<div align="left">V&aacute;lasz</div>
-					</th>
-				</tr>
-				<%
-				  PollsServletDAO dao = new PollsServletDAO(null);
+		<table width="100%" border="1">
+			<tr>
+				<td>
+					<table width="100%" border="0">
+						<tr>
+							<th>
+								<div align="left">Szavaz&oacute;</div>
+							</th>
+							<th>
+								<div align="left">Lehet&otilde;s&eacute;g</div>
+							</th>
+							<th>
+								<div align="left">V&aacute;lasz</div>
+							</th>
+						</tr>
+						<%
+				  PollsServletDAO dao = PollsServletDAO.getInstance();
 
 				  int pollID = Integer.parseInt(WebUtils.getParameter(request,
-				      PollsServlet.POLL_ID));
+				      HTTPRequestParamNames.POLL_ID));
 
 				  List<Vote> votes = dao.getVotesForPoll(pollID);
 
@@ -41,20 +41,20 @@
 				    {
 				      String key = voteOption.name + " - " + voteOption.value;
 				%>
-				<tr <%=cnt %2 == 0 ? "" : "bgcolor='#DDDDDD'" %>>
+						<tr <%=cnt %2 == 0 ? "" : "bgcolor='#DDDDDD'" %>>
 
-					<td><%=((User) dao.get(vote.userID, User.class)).emailAddress%></td>
-					<td><%=voteOption.name%></td>
-					<td><%=getVoteValue(voteOption)%></td>
-				</tr>
-				<%
+							<td><%=((User) dao.get(vote.userID, User.class)).emailAddress%></td>
+							<td><%=voteOption.name%></td>
+							<td><%=getVoteValue(voteOption)%></td>
+						</tr>
+						<%
 				  }
 				  }
 				%>
-			</table>
-			</td>
-		</tr>
-	</table>
+					</table>
+				</td>
+			</tr>
+		</table>
 	</td>
 </tr>
 

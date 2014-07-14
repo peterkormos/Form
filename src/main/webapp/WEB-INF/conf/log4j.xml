@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<!DOCTYPE log4j:configuration PUBLIC
+  "-//APACHE//DTD LOG4J 1.2//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
 
-<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
+	debug="false">
 
-  <appender name="ASYNC_MSZPollsServlet" class="org.apache.log4j.AsyncAppender">
-    <appender-ref ref="FILE_MSZPollsServlet"/>
-  </appender>
+	<appender name="ASYNC_PollsServlet" class="org.apache.log4j.AsyncAppender">
+		<appender-ref ref="FILE_PollsServlet" />
+	</appender>
 
-  <appender name="FILE_MSZPollsServlet" class="org.apache.log4j.RollingFileAppender">
-    <param name="File" value="MSZPollsServlet.log"/>
-    <param name="MaxFileSize" value="100MB"/>
-    <param name="MaxBackupIndex" value="5"/>
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="[%d{ISO8601}] - %m%n" />
-    </layout>
-  </appender>
+	<appender name="FILE_PollsServlet" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="PollsServlet.log" />
+		<param name="MaxFileSize" value="100MB" />
+		<param name="MaxBackupIndex" value="5" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%d{ISO8601}] - %m%n" />
+		</layout>
+	</appender>
 
 
-  <logger name="org.msz.servlet.MSZPollsServlet">
-        <level value="TRACE" />
-    <appender-ref ref="ASYNC_MSZPollsServlet"/>
-  </logger>
-    
+	<logger name="org.msz">
+		<level value="TRACE" />
+		<appender-ref ref="ASYNC_PollsServlet" />
+	</logger>
+
 </log4j:configuration>

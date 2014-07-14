@@ -4,40 +4,20 @@
 <%@page import="org.msz.servlet.datatype.*"%>
 <%@page import="java.util.*"%>
 <%@page import="org.msz.servlet.datatype.Vote"%>
-<%@page import="java.io.File"%>
+
+<%@page import="java.io.File"%><html>
+
+<%@include file="util.jsp"%>
 
 <%
-  PollsServletDAO dao = PollsServletDAO.getInstance();
-  int userID = Integer.parseInt((String) session
-      .getAttribute(HTTPRequestParamNames.USER_ID));
+highlightStart = 0xE0E0E0;
+
+PollsServletDAO dao = PollsServletDAO.getInstance();
+  int userID = Integer.parseInt((String) session.getAttribute(HTTPRequestParamNames.USER_ID));
   User user = (User) dao.get(userID, User.class);
 %>
-<table width="100%" border="1" cellspacing="0" cellpadding="0">
-	<tr>
-		<td>
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr valign="top">
-					<td width="350"><strong>Szavaz&aacute;s</strong></td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr valign="top">
-					<td>&nbsp;</td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr valign="top">
-					<td>&Uacute;j szavaz&aacute;s</td>
-					<td>
-						<form accept-charset="UTF-8" action="inputPoll.jsp" method="POST">
-							<input type="submit"
-								value="&Uacute;j szavaz&aacute;s felvitele a rendszerbe">
-						</form>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
 
-<br>
+<p>
 <table width="100%" border="1" cellspacing="0" cellpadding="0">
 	<tr>
 		<td>
@@ -50,7 +30,7 @@
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 				</tr>
-				<tr valign="top">
+				<tr valign="top" bgcolor="<%=highlight()%>">
 					<td>Z&aacute;rt szavaz&aacute;shoz szavaz&oacute;-csoport
 						l&eacute;trehoz&aacute;sa:</td>
 					<td>
@@ -64,10 +44,10 @@
 						</form>
 					</td>
 				</tr>
-				<tr valign="top">
-					<td bgcolor="#E0E0E0">Szavaz&oacute;-csoporthoz szavazat
+				<tr valign="top" bgcolor="<%=highlight()%>">
+					<td>Szavaz&oacute;-csoporthoz szavazat
 						hozz&aacute;rendel&eacute;se:</td>
-					<td bgcolor="#E0E0E0">
+					<td>
 						<form accept-charset="UTF-8" action="../PollsServlet"
 							method="POST">
 							<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
@@ -78,24 +58,23 @@
 									<td width="77%"><select
 										name="<%=HTTPRequestParamNames.POLL_GROUP_ID%>">
 											<%
-							  for (PollGroup pollGroup : user.getPollGroups())
-							    out.println("<option value='" + pollGroup.id + "'>"
-							        + pollGroup.groupName + " </option>");
-							%>
+											  for (PollGroup pollGroup : user.getPollGroups())
+													out.println("<option value='" + pollGroup.id + "'>" + pollGroup.groupName + " </option>");
+											%>
 									</select></td>
 								</tr>
 								<tr>
 									<td width="23%">Szavaz&aacute;s:</td>
 									<td width="77%"><select name="<%=HTTPRequestParamNames.POLL_ID%>">
-											<%
-							  for (Record record : user.getOwnedPolls())
-							  {
-							    Poll poll = (Poll) record;
 
-							    out.println("<option value='" + poll.id + "'>" + poll.title
-							        + " </option>");
-							  }
-							%>
+											<%
+											  for (Record record : user.getOwnedPolls())
+											  {
+													Poll poll = (Poll) record;
+
+													out.println("<option value='" + poll.id + "'>" + poll.title + " </option>");
+											  }
+											%>
 									</select></td>
 								</tr>
 							</table>
@@ -104,7 +83,7 @@
 						</form>
 					</td>
 				</tr>
-				<tr valign="top">
+				<tr valign="top" bgcolor="<%=highlight()%>">
 					<td>Szavaz&oacute;-csoporthoz emberekek
 						hozz&aacute;rendel&eacute;se:</td>
 					<td>
@@ -118,10 +97,9 @@
 									<td width="77%"><select
 										name="<%=HTTPRequestParamNames.POLL_GROUP_ID%>">
 											<%
-							  for (PollGroup pollGroup : user.getPollGroups())
-							    out.println("<option value='" + pollGroup.id + "'>"
-							        + pollGroup.groupName + " </option>");
-							%>
+											  for (PollGroup pollGroup : user.getPollGroups())
+													out.println("<option value='" + pollGroup.id + "'>" + pollGroup.groupName + " </option>");
+											%>
 									</select></td>
 								</tr>
 								<tr>
@@ -137,43 +115,39 @@
 						</form>
 					</td>
 				</tr>
-				<tr valign="top">
-					<td bgcolor="#E0E0E0">Eddig a szavaz&oacute;-csoporthoz
-						rendelt emberek:</td>
-					<td bgcolor="#E0E0E0"><form accept-charset="UTF-8"
-							action="usersInGroup.jsp" method="POST">
+				<tr valign="top" bgcolor="<%=highlight()%>">
+					<td>Eddig a szavaz&oacute;-csoporthoz rendelt emberek:</td>
+					<td><form accept-charset="UTF-8" action="usersInGroup.jsp"
+							method="POST">
 							Szavaz&oacute;-csoport: <select
 								name="<%=HTTPRequestParamNames.POLL_GROUP_ID%>">
 								<%
-							  for (PollGroup pollGroup : user.getPollGroups())
-							    out.println("<option value='" + pollGroup.id + "'>"
-							        + pollGroup.groupName + " </option>");
-							%>
+								  for (PollGroup pollGroup : user.getPollGroups())
+										out.println("<option value='" + pollGroup.id + "'>" + pollGroup.groupName + " </option>");
+								%>
 							</select> <input type="button" onClick="this.parentNode.submit();"
 								value="Megn&eacute;z">
 						</form></td>
 				</tr>
-				<tr valign="top">
-					<td bgcolor="#E0E0E0">Z&aacute;rt szavaz&aacute;sn&aacute;l
-						email &eacute;rtes&iacute;t&otilde; kik&uuml;ld&eacute;se a
+				<tr valign="top" bgcolor="<%=highlight()%>">
+					<td>Z&aacute;rt szavaz&aacute;sn&aacute;l email
+						&eacute;rtes&iacute;t&otilde; kik&uuml;ld&eacute;se a
 						szavaz&oacute;knak</td>
-					<td bgcolor="#E0E0E0">
+					<td>
 						<form accept-charset="UTF-8" action="../PollsServlet"
 							method="POST">
 							<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
 								value="<%=PollsServlet.Command.sendEmails%>">
 							Szavaz&aacute;s: <select name="<%=HTTPRequestParamNames.POLL_ID%>">
 								<%
-					  for (Record record : dao.getPollsFromGroups(user.getPollGroups()))
-					  {
-					    Poll poll = (Poll) record;
+								  for (Record record : dao.getPollsFromGroups(user.getPollGroups()))
+								  {
+										Poll poll = (Poll) record;
 
-					    out.println("<option value='" + poll.id
-					        + "' onclick=\"this.parentNode.submit();"
-					        + PollsServlet.Command.sendEmails + "' )\">" + poll.title
-					        + "</option>");
-					  }
-					%>
+										out.println("<option value='" + poll.id + "' onclick=\"this.parentNode.submit();"
+										    + PollsServlet.Command.sendEmails + "' )\">" + poll.title + "</option>");
+								  }
+								%>
 							</select> <input type="button" onClick="this.parentNode.submit();"
 								value="Email-ek elk&uuml;ld&eacute;se">
 						</form>
@@ -183,3 +157,21 @@
 		</td>
 	</tr>
 </table>
+
+<%
+  for (PollGroup group : user.getPollGroups())
+  {
+		String file = config.getServletContext().getRealPath("") + File.separator + group.groupName + ".jsp";
+
+		//out.println(file + "<br>");
+
+		if (new File(file).exists())
+		{
+		  String jspFile = group.groupName + ".jsp";
+%>
+<br>
+<jsp:include page="<%=jspFile%>" />
+<%
+  }
+  }
+%>

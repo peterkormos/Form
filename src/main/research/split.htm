@@ -28,27 +28,30 @@ function recalculateFreeAmount()
 
 </script>
 
-</head><body>
-<input type="hidden" id="options" value="3">
+</head>
+<body>
+	<input type="hidden" id="options" value="3">
 
-				<table width="100%" border="0">
-                    <tr>
-                      <td width="42%">Felhaszn&aacute;lhat&oacute; &ouml;sszeg: </td>
-                      <td width="58%"><label id="maxAmount" >100</label></td>
-                    </tr>
-                    <tr>
-                      <td>M&eacute;g rendelkez&eacute;sre &aacute;ll&oacute; &ouml;sszeg:</td>
-                      <td><label id="freeAmount" >0</label></td>
-                    </tr>
-                  </table>
-                  <p>a 
-                    <input type="hidden" name="optionName1" value="a">
-                    <input type="text" name="optionValue1" id="optionValue1" onChange="recalculateFreeAmount()">
-                    <br>b
-                    <input type="hidden" name="optionName2" value="b">
-                    <input type="text" name="optionValue2" id="optionValue2" onChange="recalculateFreeAmount()">
-                    <br>c
-                    <input type="hidden" name="optionName2" value="c">
-                    <input type="text" name="optionValue2" id="optionValue3" onChange="recalculateFreeAmount()">
-					
-</body></html>
+	<table border="" style="width: 100%">
+		<tr>
+			<td width="42%">Felhaszn&aacute;lhat&oacute; &ouml;sszeg:</td>
+			<td width="58%"><label id="maxAmount">100</label></td>
+		</tr>
+		<tr>
+			<td>M&eacute;g rendelkez&eacute;sre &aacute;ll&oacute;
+				&ouml;sszeg:</td>
+			<td><label id="freeAmount">0</label></td>
+		</tr>
+	</table>
+	<p>
+		a <input type="hidden" name="optionName1" value="a"> <input
+			type="text" name="optionValue1" id="optionValue1"
+			onChange="recalculateFreeAmount()"> <br>b <input
+			type="hidden" name="optionName2" value="b"> <input
+			type="text" name="optionValue2" id="optionValue2"
+			onChange="recalculateFreeAmount()"> <br>c <input
+			type="hidden" name="optionName2" value="c"> <input
+			type="text" name="optionValue2" id="optionValue3"
+			onChange="recalculateFreeAmount()">
+</body>
+</html>

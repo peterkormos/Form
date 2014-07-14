@@ -70,6 +70,7 @@ public class Vote extends OptionsBag
     this.pollID = pollID;
   }
 
+  @SuppressWarnings("unchecked")
   public Set<VoteOption> getOptions()
   {
     if (options == null)

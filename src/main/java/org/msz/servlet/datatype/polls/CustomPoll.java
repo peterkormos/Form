@@ -14,7 +14,7 @@ import org.msz.servlet.datatype.PollGroup;
 public class CustomPoll extends Poll
 {
 
-  @Column(name = "poll_id", insertable = false, updatable = false)
+  @Column(name = "poll_id", insertable = false, updatable = false, nullable=false)
   public int pollID;
 
   public CustomPoll()

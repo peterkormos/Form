@@ -9,15 +9,15 @@
 <html>
 <body>
 
-<table width="100%" border="1" cellspacing="0" cellpadding="0">
+	<table width="100%" border="1" cellspacing="0" cellpadding="0">
 
-<jsp:include page="pollHeader.jsp"/>
+		<jsp:include page="pollHeader.jsp" />
 
-<jsp:include page="statisticsDetails.jsp"/>
+		<jsp:include page="statisticsDetails.jsp" />
 
-<jsp:include page="voteList.jsp"/>
+		<jsp:include page="voteList.jsp" />
 
-</table>
+	</table>
 
 </body>
 </html>

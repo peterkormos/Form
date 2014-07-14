@@ -7,10 +7,10 @@
 
 <%
   String userID = WebUtils.getOptionalParameter(request,
-					PollsServlet.USER_ID);
+					HTTPRequestParamNames.USER_ID);
 			User user = null;
 			if (userID != null) {
-				PollsServletDAO dao = new PollsServletDAO(null);
+				PollsServletDAO dao = PollsServletDAO.getInstance();
 				user = (User) dao.get(Integer.parseInt(userID), User.class);
 			}
 %>
@@ -23,11 +23,6 @@
 	src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAqev4fRnaiSo-XtAyyOdatRRO9qeUkRN7-Fvh2OLBEjwyQcLANhQ0UxuTtSFlxaQksGU210KhsRdkoA"
 	type="text/javascript">
 </script>
-
-<xscript
-	src="http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js"
-	type="text/javascript">
-</xscript>
 
 <script type="text/javascript">
 
@@ -116,70 +111,77 @@ function checkData()
 </head>
 
 <body onload="initialize()" onunload="GUnload()">
-<form accept-charset="UTF-8" action="../PollsServlet" method="post">
+	<form accept-charset="UTF-8" action="../PollsServlet" method="post">
 
-<input type="hidden" name="<%=PollsServlet.COMMAND%>"
-	value="<%=PollsServlet.COMMAND_SAVE_USER%>">
+		<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
+			value="<%=PollsServlet.Command.saveUser%>">
 
-<table border="0">
-	<tr>
-		<td>Email c&iacute;m:</td>
-		<td><input type="email"
-			name="<%=PollsServlet.USER_EMAIL_ADDRESS%>"
-			value="<%=user != null ? user.emailAddress : ""%>"> <font
-			color="#FF0000" size="+2">&#8226;</font></td>
-	</tr>
-	<tr>
-		<td>Jelsz&oacute;:</td>
-		<td><input type="password"
-			name="<%=PollsServlet.USER_PASSWORD%>"
-			value="<%=user != null ? user.password : ""%>"> <font
-			color="#FF0000" size="+2">&#8226;</font></td>
-	</tr>
-	<tr>
-		<td>C&iacute;m:</td>
-		<td>
+		<table border="0">
+			<tr>
+				<td>Email c&iacute;m:</td>
+				<td><input type="email"
+					name="<%=HTTPRequestParamNames.USER_EMAIL_ADDRESS%>"
+					value="<%=user != null ? user.emailAddress : ""%>"> <font
+					color="#FF0000" size="+2">&#8226;</font></td>
+			</tr>
+			<tr>
+				<td>Jelsz&oacute;:</td>
+				<td><input type="password"
+					name="<%=HTTPRequestParamNames.USER_PASSWORD%>"
+					value="<%=user != null ? user.password : ""%>"> <font
+					color="#FF0000" size="+2">&#8226;</font></td>
+			</tr>
+			<tr>
+				<td>C&iacute;m:</td>
+				<td>
 
 
 
-		<p><strong>Add meg a felvivend&otilde; pont
-		c&iacute;m&eacute;t, vagy kattints a t&eacute;rk&eacute;pre....</strong></p>
-		<p>C&iacute;m: <input type="text" size="60"
-			name="<%=PollsServlet.USER_ADDRESS%>"
-			value="<%=user != null ? user.address != null
+					<p>
+						<strong>Add meg a felvivend&otilde; pont
+							c&iacute;m&eacute;t, vagy kattints a t&eacute;rk&eacute;pre....</strong>
+					</p>
+					<p>
+						C&iacute;m: <input type="text" size="60"
+							name="<%=HTTPRequestParamNames.USER_ADDRESS%>"
+							value="<%=user != null ? user.address != null
 					? user.address
 					: "" : ""%>"
-			id="addressID" onChange="showAddress(this.value);" /> <input
-			type="button" value="Cím megmutatása a térképen"
-			onClick="showAddress(document.getElementById('addressID').value);">
-		<input type="hidden" name="<%=PollsServlet.USER_ADDRESS_LAT%>"
-			value="<%=user != null ? user.lat : ""%>" id="pointLat" /> <input
-			type="hidden" name="<%=PollsServlet.USER_ADDRESS_LNG%>"
-			value="<%=user != null ? user.lng : ""%>" id="pointLng" /></p>
+							id="addressID" onChange="showAddress(this.value);" /> <input
+							type="button" value="Cím megmutatása a térképen"
+							onClick="showAddress(document.getElementById('addressID').value);">
+						<input type="hidden" name="<%=HTTPRequestParamNames.USER_ADDRESS_LAT%>"
+							value="<%=user != null ? user.lat : ""%>" id="pointLat" /> <input
+							type="hidden" name="<%=HTTPRequestParamNames.USER_ADDRESS_LNG%>"
+							value="<%=user != null ? user.lng : ""%>" id="pointLng" />
+					</p>
 
-		<div id="map_canvas" style="width: 400px; height: 300px"></div>
-
-
-
+					<div id="map_canvas" style="width: 400px; height: 300px"></div>
 
 
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-		<div align="center">
-		<p><input type="submit"
-			value="<%=user != null
+
+
+
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div align="center">
+						<p>
+							<input type="submit"
+								value="<%=user != null
 					? "M&oacute;dos&iacute;t&aacute;s"
 					: "Regisztr&aacute;ci&oacute;"%>">
+						</p>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<p>
+			<font color="#FF0000" size="+2">&#8226;</font> k&ouml;telez&otilde;
+			megadni
 		</p>
-		</div>
-		</td>
-	</tr>
-</table>
-<p><font color="#FF0000" size="+2">&#8226;</font>
-k&ouml;telez&otilde; megadni</p>
-</form>
+	</form>
 
 
 </body>

@@ -9,14 +9,14 @@ import org.msz.datatype.Record;
 @MappedSuperclass
 public abstract class OptionsBag extends Record
 {
-    OptionsBag()
-    {
-    }
+  OptionsBag()
+  {
+  }
 
-    OptionsBag(int id)
-    {
+  OptionsBag(int id)
+  {
 	super(id);
-    }
+  }
 
-    public abstract Set getOptions();
+  public abstract <T> Set<T> getOptions();
 }

@@ -2,7 +2,6 @@ package org.msz.servlet.datatype.polls;
 
 import java.util.List;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,7 +19,7 @@ import org.msz.servlet.datatype.VoteOption;
 @PrimaryKeyJoinColumn(name = "poll_id")
 public class OrderingPoll extends Poll
 {
-  @Column(name = "poll_id", insertable = false, updatable = false)
+  @Column(name = "poll_id", insertable = false, updatable = false, nullable = false)
   public int pollID;
 
   public OrderingPoll()
@@ -56,7 +55,7 @@ public class OrderingPoll extends Poll
 
   public SortedMap<String, String> getPollSpecificStatistics(List<Vote> votes)
   {
-    SortedMap map = super.getPollSpecificStatistics(votes);
+    SortedMap<String, String> map = super.getPollSpecificStatistics(votes);
 
     if (!votes.isEmpty())
       for (PollOption pollOption : options)
@@ -71,6 +70,8 @@ public class OrderingPoll extends Poll
           }
         }
         avg /= votes.size();
+        map.put("&Aacute;tlag pontsz&aacute;m ( avg = &sum;vote / # ): ",
+            "");
         map.put("&Aacute;tlag pontsz&aacute;m [" + pollOption.name + "]: ",
             String.valueOf(avg));
 
@@ -96,9 +97,13 @@ public class OrderingPoll extends Poll
           }
         }
         distribution /= votes.size();
+        map.put("Megoszt&aacute;si mutat&oacute; ( distribution = &sum; |vote| - avg  / # ): ",
+            "");
         map.put("Megoszt&aacute;si mutat&oacute; [" + pollOption.name + "]: ",
             String.valueOf(distribution));
 
+        map.put("V&eacute;geredm&eacute;ny ( avg + distribution ): ",
+            "");
         map.put("V&eacute;geredm&eacute;ny [" + pollOption.name + "]: ",
             String.valueOf(avg+distribution));
       }

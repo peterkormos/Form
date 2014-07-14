@@ -12,18 +12,18 @@
 
 </head>
 <body>
-<%
-    PollsServletDAO dao = new PollsServletDAO(null);
+	<%
+    PollsServletDAO dao = PollsServletDAO.getInstance();
 
     Set<Record> polls = (Set<Record>) dao.getAll(Poll.class);
 %>
 
-<form accept-charset="UTF-8" action="../PollsServlet" method="POST" accept-charset="UTF-8">
-<input type="hidden"
-	id="command" name="<%=PollsServlet.COMMAND %>"
-	value="<%=PollsServlet.COMMAND_DELETE_POLL %>"> <select
-	name="<%=PollsServlet.POLL_ID %>">
-	<%
+	<form accept-charset="UTF-8" action="../PollsServlet" method="POST"
+		accept-charset="UTF-8">
+		<input type="hidden" id="command" name="<%=HTTPRequestParamNames.COMMAND %>"
+			value="<%=PollsServlet.Command.deletePoll %>"> <select
+			name="<%=HTTPRequestParamNames.POLL_ID %>">
+			<%
 	    for (Record record : polls)
 	    {
 			Poll poll = (Poll) record;
@@ -32,9 +32,8 @@
 				+ " </option>");
 	    }
 	%>
-</select> 
-  <input type="submit" value="T&ouml;r&ouml;l">
-</form>
+		</select> <input type="submit" value="T&ouml;r&ouml;l">
+	</form>
 </body>
 </html>
 

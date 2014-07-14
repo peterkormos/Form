@@ -2,7 +2,6 @@ package org.msz.servlet.datatype;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -51,7 +50,7 @@ public class Poll extends OptionsBag
   @Column(name = "owner_id")
   public int ownerID;
 
-  @Column(name = "group_id")
+  @Column(name = "group_id", nullable = true)
   public int groupID;
 
   @Override
@@ -113,6 +112,7 @@ public class Poll extends OptionsBag
   // this.users = users;
   // }
 
+  @SuppressWarnings("unchecked")
   public Set<PollOption> getOptions()
   {
     if (options == null)

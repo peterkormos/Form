@@ -1,5 +1,6 @@
 <%@page import="org.msz.servlet.*"%>
 <%@page import="org.msz.servlet.datatype.*"%>
+<%@page import="org.msz.servlet.datatype.polls.*"%>
 <%@page import="org.msz.util.WebUtils"%>
 <%@page import="java.util.*"%>
 <%@page import="org.msz.datatype.Record"%>
@@ -12,7 +13,7 @@
 		var sumAmount = 0;
 		var options = document.getElementById('options').value;
 
-		for ( var i = 1; i <= options; i++) {
+		for (var i = 1; i <= options; i++) {
 			//		alert("["+ document.getElementById('optionValue'+i).value + "]");
 
 			var currentValue = document.getElementById('optionValue' + i).value;
@@ -89,268 +90,255 @@
 </head>
 <body>
 
-<%
-  PollsServletDAO dao = new PollsServletDAO(null);
+	<%
+	  PollsServletDAO dao = PollsServletDAO.getInstance();
 
-  int pollID = Integer.parseInt(WebUtils.getParameter(request,
-      PollsServlet.POLL_ID));
-  Poll poll = (Poll) dao.get(pollID, Poll.class);
-%>
-
-
-<%
-  String pollURL = PollsServlet.getPollURL(pollID);
-%>
-<a href="<%=pollURL%>">Webc&iacute;m anon&iacute;m
-szavaz&aacute;shoz:</a>
-<br>
-<input size="100" type="text" value="<%=pollURL%>">
-<p>
-<form accept-charset="UTF-8" name="input" action="../PollsServlet"
-	method="post"><input type="hidden"
-	name="<%=PollsServlet.COMMAND%>"
-	value="<%=PollsServlet.COMMAND_SAVE_VOTE%>"> <input
-	type="hidden" name="<%=PollsServlet.POLL_ID%>" value="<%=pollID%>">
-
-<%
-  if (session.getAttribute(PollsServlet.USER_ID) == null)
-  {
-%> Szavaz&oacute; email c&iacute;me: <input type="text"
-	name="<%=PollsServlet.ANONYMOUS_VOTE%>">
-<p>
-<%
-  }
-%>
-
-<table width="100%" border="1" cellspacing="0" cellpadding="0">
-
-	<jsp:include page="pollHeader.jsp" />
-
-<%
-  if (session.getAttribute(PollsServlet.USER_ID) != null)
-  {
-%> 
-    <jsp:include page="statisticsDetails.jsp" />
-<%
-  }
-%>
+	  int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	  Poll poll = (Poll) dao.get(pollID, Poll.class);
+	%>
 
 
-	<tr>
-		<td>V&aacute;laszt&aacute;si lehet&otilde;s&eacute;gek:</td>
-		<td><!-- SplitPointsPoll --> <%
+	<%
+	  String pollURL = request.getRequestURL() + "?pollID=" + pollID;
+	%>
+	<a href="<%=pollURL%>">Webc&iacute;m anon&iacute;m
+		szavaz&aacute;shoz:</a>
+	<br>
+	<input size="100" type="text" value="<%=pollURL%>">
+	<p>
+	<form accept-charset="UTF-8" name="input" action="../PollsServlet"
+		method="post">
+		<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
+			value="<%=PollsServlet.Command.saveVote%>"> <input
+			type="hidden" name="<%=HTTPRequestParamNames.POLL_ID%>"
+			value="<%=pollID%>">
+
+		<%
+		  if (session.getAttribute(HTTPRequestParamNames.USER_ID) == null)
+		  {
+		%>
+		Szavaz&oacute; email c&iacute;me: <input type="text"
+			name="<%=HTTPRequestParamNames.ANONYMOUS_VOTE%>">
+		<p>
+			<%
+			  }
+			%>
+		
+		<table width="100%" border="1" cellspacing="0" cellpadding="0">
+
+			<jsp:include page="pollHeader.jsp" />
+
+			<tr>
+				<td>V&aacute;laszt&aacute;si lehet&otilde;s&eacute;gek:</td>
+				<td>
+					<!-- SplitPointsPoll --> <%
    if (poll instanceof SplitPointsPoll)
    {
-     SplitPointsPoll splitPointsPoll = (SplitPointsPoll) poll;
+ 		SplitPointsPoll splitPointsPoll = (SplitPointsPoll) poll;
  %> <input type="hidden" id="options" value="<%=poll.options.size()%>">
-		<table width="100%" border="0">
-			<tr>
-				<td width="70%">Felhaszn&aacute;lhat&oacute; &ouml;sszeg:</td>
-				<td width="30%"><label id="maxAmount"><%=splitPointsPoll.maxAmount%></label>
-				<%=splitPointsPoll.units%></td>
+					<table width="100%" border="0">
+						<tr>
+							<td width="70%">Felhaszn&aacute;lhat&oacute; &ouml;sszeg:</td>
+							<td width="30%"><label id="maxAmount"><%=splitPointsPoll.maxAmount%></label>
+								<%=splitPointsPoll.units%></td>
+						</tr>
+						<tr>
+							<td>M&eacute;g rendelkez&eacute;sre &aacute;ll&oacute;
+								&ouml;sszeg:</td>
+							<td><label id="freeAmount"><%=splitPointsPoll.maxAmount%></label>
+								<%=splitPointsPoll.units%></td>
+						</tr>
+					</table> <%
+   }
+ %> <!-- SplitPointsPoll --> <!-- OrderingPoll --> <%
+   if (poll instanceof OrderingPoll)
+   {
+ %>
+					<div id="containerDiv">
+						<%
+						  }
+						  List<PollOption> list = new LinkedList<PollOption>(poll.options);
+						  Collections.sort(list, new Comparator<PollOption>()
+						  {
+								public int compare(PollOption arg0, PollOption arg1)
+								{
+								  return new Integer(arg0.id).compareTo(new Integer(arg1.id));
+								}
+						  });
+						%>
+						<!-- OrderingPoll -->
+						<table width="100%" border="0">
+							<%
+							  int httpIndex = 1;
+							  for (PollOption option : list)
+							  {
+							%>
+							<tr>
+								<%
+								  if (poll instanceof SingleDecisionPoll)
+										{
+										  if (httpIndex == 1)
+										  {
+								%>
+								<input type='hidden' name='<%=HTTPRequestParamNames.OPTION_VALUE + 1%>' value='igen'>
+<%} %>
+								<td><%=option.name%></td>
+								<td><input type='radio'
+									name='<%=HTTPRequestParamNames.OPTION_NAME + 1%>'
+									value='<%=option.name%>'></td>
+								<%
+								  }
+										else if (poll instanceof MultiDecisionPoll)
+										{
+								%>
+								<input type='hidden'
+									name='<%=HTTPRequestParamNames.OPTION_NAME + httpIndex%>'
+									value='<%=option.name%>'>
+								<td><%=option.name%></td>
+								<td><input type='checkbox'
+									name='<%=HTTPRequestParamNames.OPTION_VALUE + httpIndex%>'
+									value='igen'></td>
+								<%
+								  }
+										else if (poll instanceof SplitPointsPoll)
+										{
+								%>
+								<td><%=option.name%></td>
+								<td><input type='hidden'
+									name='<%=HTTPRequestParamNames.OPTION_NAME + httpIndex%>'
+									value='<%=option.name%>'> <input type='text'
+									name='<%=HTTPRequestParamNames.OPTION_VALUE + httpIndex%>'
+									id='<%=HTTPRequestParamNames.OPTION_VALUE + httpIndex%>'
+									onChange='recalculateFreeAmount()'></td>
+								<%
+								  }
+										else if (poll instanceof AwardingPoll)
+										{
+										  AwardingPoll awardingPoll = (AwardingPoll) poll;
+								%>
+								<td><%=option.name%></td>
+								<td><input type='hidden'
+									name='<%=HTTPRequestParamNames.OPTION_NAME + httpIndex%>'
+									value='<%=option.name%>'> <%
+   for (int i = 1; i <= awardingPoll.maxAmount; i++)
+ 		  {
+ %> <input type='radio'
+									name='<%=HTTPRequestParamNames.OPTION_VALUE + httpIndex%>'
+									value='<%=i%>'> <%=i%> <%
+   }
+ %></td>
+
+								<%
+								  }
+										else if (poll instanceof OrderingPoll)
+										{
+								%>
+								<div id="<%=httpIndex%>">
+
+									<input type="text"
+										name="<%=HTTPRequestParamNames.OPTION_VALUE + httpIndex%>"
+										value="<%=httpIndex%>" readonly="readonly" size="4">
+
+									<%=option.name%>
+
+									<input type="hidden"
+										name="<%=HTTPRequestParamNames.OPTION_NAME + httpIndex%>"
+										value="<%=option.name%>"> <input type="button"
+										value="^" onClick="moveUp(this.parentNode)"> <input
+										type="button" value="v" onClick="moveDown(this.parentNode)">
+								</div>
+								<%
+								  }
+										else if (poll instanceof FormTypePoll)
+										{
+								%>
+
+								<td><%=option.name%></td>
+								<td><input type="hidden"
+									name="<%=HTTPRequestParamNames.OPTION_NAME + httpIndex%>"
+									value="<%=option.name%>"> <input type="text"
+									name="<%=HTTPRequestParamNames.OPTION_VALUE + httpIndex%>"></td>
+								<%
+								  }
+										else if (poll instanceof CustomPoll)
+										{
+								%>
+								<td><%=option.name%></td>
+								<td><input type="hidden"
+									name="<%=HTTPRequestParamNames.OPTION_NAME + httpIndex%>"
+									value="<%=option.name%>"> <%
+   if (HTTPRequestParamNames.OPTION_TYPE_TEXT.equals(option.type))
+ 		  {
+ %> <input type="text"
+									name="<%=HTTPRequestParamNames.OPTION_VALUE + httpIndex%>">
+									<br> <%
+   }
+ 		  else if (HTTPRequestParamNames.OPTION_TYPE_CHECKBOX.equals(option.type))
+ 		  {
+ %> <input type="checkbox"
+									name="<%=HTTPRequestParamNames.OPTION_VALUE + httpIndex%>"
+									value='igen'> <br> <%
+   }
+ 		  else if (HTTPRequestParamNames.OPTION_TYPE_RADIO.equals(option.type))
+ 		  {
+ 			if (option.value != null)
+ 			{
+ 			  StringTokenizer st = new StringTokenizer(option.value, ",");
+ 			  while (st.hasMoreTokens())
+ 			  {
+ 				String radioOption = st.nextToken().trim();
+ %> <%=radioOption%> <input type="radio"
+									name="<%=HTTPRequestParamNames.OPTION_VALUE + httpIndex%>"
+									value="<%=radioOption%>"> <%
+   }
+ 			}
+ %></td>
+
+								<%
+								  }
+										}
+										else
+										  out.println(poll.getClass().getName());
+
+										httpIndex++;
+								%>
+
+							</tr>
+							<%
+							  }
+							%>
+						</table>
+						<!-- OrderingPoll -->
+						<%
+						  if (poll instanceof OrderingPoll)
+						  {
+						%>
+					</div> <%
+   }
+ %> <!-- OrderingPoll -->
+				</td>
 			</tr>
-			<tr>
-				<td>M&eacute;g rendelkez&eacute;sre &aacute;ll&oacute;
-				&ouml;sszeg:</td>
-				<td><label id="freeAmount"><%=splitPointsPoll.maxAmount%></label>
-				<%=splitPointsPoll.units%></td>
+
+			<%
+			  if (session.getAttribute(HTTPRequestParamNames.USER_ID) != null)
+			  {
+			%>
+			<jsp:include page="statisticsDetails.jsp" />
+			<%
+			  }
+			%>
+
+			<tr bgcolor="#99FFCC">
+				<td colspan="2">
+					<div align="center">
+						<input name="submit" type="submit" value="Ment&eacute;s">
+					</div>
+				</td>
 			</tr>
 		</table>
-		<%
-		  }
-		%> <!-- SplitPointsPoll --> <!-- OrderingPoll --> <%
-   if (poll instanceof OrderingPoll)
-   {
- %>
-		<div id="containerDiv">
-		<%
-		  }
-   List<PollOption> list = new LinkedList<PollOption>(poll.options);
-   Collections.sort(list, new Comparator<PollOption>()
-   {
-     public int compare(PollOption arg0, PollOption arg1)
-     {
-       return new Integer(arg0.id).compareTo(new Integer(arg1.id));
-     }
-   });
-		%> <!-- OrderingPoll --> 
-		<table width="100%" border="0">
-		<%
-		  int httpIndex = 1;
-		  for (PollOption option : list)
-		  {
- %>
-			<tr>
-		<%
-		    if (poll instanceof SingleDecisionPoll)
-		    {
-		      if (httpIndex == 1)
-		        %> 
-		        <input type='hidden' name='<%=PollsServlet.OPTION_VALUE + 1 %>' value='igen' >
-
-				<td>
-                    <%=option.name %>
-                </td>
-                <td>
- 		             <input type='radio' name='<%=PollsServlet.OPTION_NAME + 1 %>' value='<%=option.name %>' >
-                </td>
-		        <%
-		    }
-		    else if (poll instanceof MultiDecisionPoll)
-		    {
-		      %>
-		      <input type='hidden' name='<%=PollsServlet.OPTION_NAME + httpIndex %>' value='<%=option.name %>' >
-                <td>
-                    <%=option.name %>
-                </td>
-                <td>
-              <input type='checkbox' name='<%=PollsServlet.OPTION_VALUE + httpIndex %>' value='igen' >
-                </td>
-              <%
-		    }
-		    else if (poll instanceof SplitPointsPoll)
-		    {
-		      %>
-                <td>
-                    <%=option.name %>
-                </td>
-                <td>
-                   <input type='hidden' name='<%=PollsServlet.OPTION_NAME + httpIndex %>' value='<%=option.name %>' >
-	       	       <input type='text' name='<%=PollsServlet.OPTION_VALUE + httpIndex %>' id='<%=PollsServlet.OPTION_VALUE + httpIndex %>'  onChange='recalculateFreeAmount()'>
-                </td>
-            <%
-		    }
-		    else if (poll instanceof AwardingPoll)
-		    {
-		      AwardingPoll awardingPoll = (AwardingPoll) poll;
-		%> 
-                <td>
-                    <%=option.name %>
-                </td>
-                <td>
-<input type='hidden'
-			name='<%=PollsServlet.OPTION_NAME + httpIndex%>'
-			value='<%=option.name%>'> 
-			<%
-   for (int i = 1; i <= awardingPoll.maxAmount; i++)
-       {
- %> <input type='radio'
-			name='<%=PollsServlet.OPTION_VALUE + httpIndex%>' value='<%=i%>'>
-		<%=i%> <%
-   }
- %>                 
-</td>
-
-		<%
-		  }
-		    else if (poll instanceof OrderingPoll)
-		    {
-		%>
-		<div id="<%=httpIndex%>">
-
-<input type="text"
-			name="<%=PollsServlet.OPTION_VALUE + httpIndex%>"
-			value="<%=httpIndex%>" readonly="readonly" size="4"> 
-			
-			<%=option.name%>
-
-		<input type="hidden"
-			name="<%=PollsServlet.OPTION_NAME + httpIndex%>"
-			value="<%=option.name%>"> 
-<input type="button" value="^"
-			onClick="moveUp(this.parentNode)"> 
-<input type="button"
-			value="v" onClick="moveDown(this.parentNode)"></div>
-		<%
-		  }
-		    else if (poll instanceof FormTypePoll)
-		    {
-		%> 
-		
-                <td>
-		<%=option.name%> 
-                </td>
-                <td>
-<input type="hidden"
-			name="<%=PollsServlet.OPTION_NAME + httpIndex%>"
-			value="<%=option.name%>"> 
-<input type="text"
-			name="<%=PollsServlet.OPTION_VALUE + httpIndex%>"> 
-                </td>
-		<%
-		  }
-		    else if (poll instanceof CustomPoll)
-		    {
-		%> 
-                <td>
-		<%=option.name%> 
-                </td>
-                <td>
-<input type="hidden"
-			name="<%=PollsServlet.OPTION_NAME + httpIndex%>"
-			value="<%=option.name%>"> 
-			<%
-   if (PollsServlet.OPTION_TYPE_TEXT.equals(option.type))
-       {
- %> <input type="text"
-			name="<%=PollsServlet.OPTION_VALUE + httpIndex%>"> <br>
-		<%
-		  }
-		      else if (PollsServlet.OPTION_TYPE_CHECKBOX.equals(option.type))
-		      {
-		%> <input type="checkbox"
-			name="<%=PollsServlet.OPTION_VALUE + httpIndex%>"  value='igen'> <br>
-		<%
-		  }
-		      else if (PollsServlet.OPTION_TYPE_RADIO.equals(option.type))
-		      {
-		        if (option.value != null)
-		        {
-		          StringTokenizer st = new StringTokenizer(option.value, ",");
-		          while (st.hasMoreTokens())
-		          {
-		            String radioOption = st.nextToken().trim();
-		%> <%=radioOption%> <input type="radio"
-			name="<%=PollsServlet.OPTION_VALUE + httpIndex%>"
-			value="<%=radioOption%>"> <%
-   }
-         }
- %> 
-                </td>
-
-		<%
-		  }
-		    }
-		    else
-		      out.println(poll.getClass().getName());
-
-		    httpIndex++;
-		    %>
-
-            </tr>
-<%
-		  }
-		%> 
-		        </table>
-		<!-- OrderingPoll --> <%
-   if (poll instanceof OrderingPoll)
-   {
- %>
-		</div>
-		<%
-		  }
-		%> <!-- OrderingPoll --></td>
-	</tr>
-	<tr bgcolor="#99FFCC">
-		<td colspan="2">
-		<div align="center"><input name="submit" type="submit"
-			value="Ment&eacute;s"></div>
 		</td>
-	</tr>
-</table>
-</td>
-</tr>
-</table>
-</form>
+		</tr>
+		</table>
+	</form>
 </body>
 </html>
