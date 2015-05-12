@@ -23,22 +23,31 @@
   }
 
   boolean highlightFlag;
-  long highlightStart;
-
-  public final String highlight()
+  long highlightStart = 0xE0E0E0;
+  
+  public String highlight(HttpServletRequest request)
   {
 	try
 	{
+	  try
+	  {
+		highlightFlag = (Boolean) request.getAttribute("highlightFlag");
+	  }
+	  catch (Exception e)
+	  {
+	  }
+	  
 	  if (highlightFlag)
 		return Long.toHexString(highlightStart);
 	  else
 	  {
-		return Long.toHexString(Math.min(highlightStart + 0x111111, 0xffffff));
+		return Long.toHexString(Math.min(highlightStart + 0xF6F4F0, 0xffffff));
 	  }
 	}
 	finally
 	{
 	  highlightFlag = !highlightFlag;
+	  request.setAttribute("highlightFlag", highlightFlag);
 	}
   }
 
@@ -52,7 +61,7 @@
 		return ((User) arg0).emailAddress.compareTo(((User) arg1).emailAddress);
 	  }
 	});
-	
+
 	return allUsers;
   }
 

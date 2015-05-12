@@ -10,15 +10,13 @@
 <%@include file="util.jsp"%>
 
 <%
-highlightStart = 0xE0E0E0;
-
-PollsServletDAO dao = PollsServletDAO.getInstance();
+  PollsServletDAO dao = PollsServletDAO.getInstance();
   int userID = Integer.parseInt((String) session.getAttribute(HTTPRequestParamNames.USER_ID));
   User user = (User) dao.get(userID, User.class);
 %>
 
 <p>
-<table width="100%" border="1" cellspacing="0" cellpadding="0">
+<table border="0" cellspacing="0" cellpadding="0">
 	<tr>
 		<td>
 			<table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -30,7 +28,7 @@ PollsServletDAO dao = PollsServletDAO.getInstance();
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 				</tr>
-				<tr valign="top" bgcolor="<%=highlight()%>">
+				<tr valign="top" bgcolor="<%=highlight(request)%>">
 					<td>Z&aacute;rt szavaz&aacute;shoz szavaz&oacute;-csoport
 						l&eacute;trehoz&aacute;sa:</td>
 					<td>
@@ -38,13 +36,13 @@ PollsServletDAO dao = PollsServletDAO.getInstance();
 							method="POST">
 							<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
 								value="<%=PollsServlet.Command.saveGroup%>"> Csoport: <input
-								type="text" name="<%=HTTPRequestParamNames.GROUP_NAME%>"> <input
-								type="button" onClick="this.parentNode.submit();"
+								type="text" name="<%=HTTPRequestParamNames.GROUP_NAME%>">
+							<input type="button" onClick="this.parentNode.submit();"
 								value="Csoport ment&eacute;se">
 						</form>
 					</td>
 				</tr>
-				<tr valign="top" bgcolor="<%=highlight()%>">
+				<tr valign="top" bgcolor="<%=highlight(request)%>">
 					<td>Szavaz&oacute;-csoporthoz szavazat
 						hozz&aacute;rendel&eacute;se:</td>
 					<td>
@@ -52,38 +50,28 @@ PollsServletDAO dao = PollsServletDAO.getInstance();
 							method="POST">
 							<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
 								value="<%=PollsServlet.Command.addPollToGroup%>">
-							<table width="100%" border="0" cellspacing="0" cellpadding="0">
-								<tr>
-									<td width="23%">Csoport:</td>
-									<td width="77%"><select
-										name="<%=HTTPRequestParamNames.POLL_GROUP_ID%>">
-											<%
-											  for (PollGroup pollGroup : user.getPollGroups())
-													out.println("<option value='" + pollGroup.id + "'>" + pollGroup.groupName + " </option>");
-											%>
-									</select></td>
-								</tr>
-								<tr>
-									<td width="23%">Szavaz&aacute;s:</td>
-									<td width="77%"><select name="<%=HTTPRequestParamNames.POLL_ID%>">
+							Csoport: <select name="<%=HTTPRequestParamNames.POLL_GROUP_ID%>">
+								<%
+								  for (PollGroup pollGroup : user.getPollGroups())
+										out.println("<option value='" + pollGroup.id + "'>" + pollGroup.groupName + " </option>");
+								%>
+							</select> Szavaz&aacute;s: <select
+								name="<%=HTTPRequestParamNames.POLL_ID%>">
 
-											<%
-											  for (Record record : user.getOwnedPolls())
-											  {
-													Poll poll = (Poll) record;
+								<%
+								  for (Record record : user.getOwnedPolls())
+								  {
+										Poll poll = (Poll) record;
 
-													out.println("<option value='" + poll.id + "'>" + poll.title + " </option>");
-											  }
-											%>
-									</select></td>
-								</tr>
-							</table>
-							<input type="button" onClick="this.parentNode.submit();"
+										out.println("<option value='" + poll.id + "'>" + poll.title + " </option>");
+								  }
+								%>
+							</select> <input type="button" onClick="this.parentNode.submit();"
 								value="Ment&eacute;s">
 						</form>
 					</td>
 				</tr>
-				<tr valign="top" bgcolor="<%=highlight()%>">
+				<tr valign="top" bgcolor="<%=highlight(request)%>">
 					<td>Szavaz&oacute;-csoporthoz emberekek
 						hozz&aacute;rendel&eacute;se:</td>
 					<td>
@@ -91,31 +79,22 @@ PollsServletDAO dao = PollsServletDAO.getInstance();
 							method="POST">
 							<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
 								value="<%=PollsServlet.Command.addUserToGroup%>">
-							<table width="100%" border="0" cellspacing="0" cellpadding="0">
-								<tr>
-									<td width="23%">Csoport:</td>
-									<td width="77%"><select
-										name="<%=HTTPRequestParamNames.POLL_GROUP_ID%>">
-											<%
-											  for (PollGroup pollGroup : user.getPollGroups())
-													out.println("<option value='" + pollGroup.id + "'>" + pollGroup.groupName + " </option>");
-											%>
-									</select></td>
-								</tr>
-								<tr>
-									<td valign="top">Szavaz&oacute;k email c&iacute;me<br>
-										(vessz&otilde;vel elv&aacute;lasztva):
-									</td>
-									<td><textarea name="<%=HTTPRequestParamNames.SUBSCRIBE_USER_ID%>"
-											cols="50"></textarea></td>
-								</tr>
-							</table>
+							Csoport: <select name="<%=HTTPRequestParamNames.POLL_GROUP_ID%>">
+								<%
+								  for (PollGroup pollGroup : user.getPollGroups())
+										out.println("<option value='" + pollGroup.id + "'>" + pollGroup.groupName + " </option>");
+								%>
+							</select> 
+							<br>Szavaz&oacute;k email c&iacute;me (vessz&otilde;vel
+							elv&aacute;lasztva):
+							<textarea name="<%=HTTPRequestParamNames.SUBSCRIBE_USER_ID%>"
+								cols="50"></textarea>
 							<input type="button" onClick="this.parentNode.submit();"
 								value="Megh&iacute;vottak hozz&aacute;rendel&eacute;se">
 						</form>
 					</td>
 				</tr>
-				<tr valign="top" bgcolor="<%=highlight()%>">
+				<tr valign="top" bgcolor="<%=highlight(request)%>">
 					<td>Eddig a szavaz&oacute;-csoporthoz rendelt emberek:</td>
 					<td><form accept-charset="UTF-8" action="usersInGroup.jsp"
 							method="POST">
@@ -129,7 +108,7 @@ PollsServletDAO dao = PollsServletDAO.getInstance();
 								value="Megn&eacute;z">
 						</form></td>
 				</tr>
-				<tr valign="top" bgcolor="<%=highlight()%>">
+				<tr valign="top" bgcolor="<%=highlight(request)%>">
 					<td>Z&aacute;rt szavaz&aacute;sn&aacute;l email
 						&eacute;rtes&iacute;t&otilde; kik&uuml;ld&eacute;se a
 						szavaz&oacute;knak</td>
@@ -138,14 +117,15 @@ PollsServletDAO dao = PollsServletDAO.getInstance();
 							method="POST">
 							<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
 								value="<%=PollsServlet.Command.sendEmails%>">
-							Szavaz&aacute;s: <select name="<%=HTTPRequestParamNames.POLL_ID%>">
+							Szavaz&aacute;s: <select
+								name="<%=HTTPRequestParamNames.POLL_ID%>">
 								<%
 								  for (Record record : dao.getPollsFromGroups(user.getPollGroups()))
 								  {
 										Poll poll = (Poll) record;
 
-										out.println("<option value='" + poll.id + "' onclick=\"this.parentNode.submit();"
-										    + PollsServlet.Command.sendEmails + "' )\">" + poll.title + "</option>");
+										out.println("<option value='" + poll.id + "' onclick=\"this.parentNode.submit();" + PollsServlet.Command.sendEmails
+										    + "' )\">" + poll.title + "</option>");
 								  }
 								%>
 							</select> <input type="button" onClick="this.parentNode.submit();"

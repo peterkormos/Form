@@ -3,56 +3,64 @@
 		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
 		"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
-	<session-factory>
+    <session-factory>
 
         <!-- Database connection settings -->
-		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-		<property name="hibernate.connection.url">${db.url}</property>
-		<property name="hibernate.connection.username">${db.user}</property>
-		<property name="connection.password">${db.password}</property>
-		<property name="hibernate.c3p0.min_size">1</property>
-		<property name="hibernate.c3p0.max_size">5</property>
-		<property name="hibernate.c3p0.timeout">1800</property>
-		<property name="hibernate.c3p0.max_statements">50</property>
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url">${db.url}</property>
+        <property name="hibernate.connection.username">${db.user}</property>
+        <property name="connection.password">${db.password}</property>
 
-		<!-- SQL dialect -->
-		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <!-- SQL dialect -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
 
-		<!-- JDBC connection pool (use the built-in) -->
-		<property name="connection.pool_size">1</property>
+        <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
 
-		<!-- Enable Hibernate's automatic session context management -->
-		<property name="current_session_context_class">thread</property>
+        <!-- configuration for connection pool via c3p0 -->
+        <property name="c3p0.min_size">1</property>
+        <property name="c3p0.max_size">20</property>
+        <property name="c3p0.acquire_increment">1</property>
+        <property name="c3p0.max_statements">50</property>
+        <property name="c3p0.timeout">14400</property>
+        <property name="c3p0.idle_test_period">3600</property>
+        <property name="c3p0.validate">true</property>
 
-		<!-- Disable the second-level cache -->
-		<property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+        <property name="connection.autoReconnect">true</property>
+        <!-- JDBC connection pool (use the built-in) -->
+        <property name="connection.pool_size">1</property>
 
-		<!-- Echo all executed SQL to stdout -->
-		<property name="show_sql">false</property>
+        <!-- Enable Hibernate's automatic session context management -->
+        <property name="current_session_context_class">thread</property>
 
-		<!-- <property name="format_sql">true</property> -->
+        <!-- Disable the second-level cache -->
+        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
 
-		<!-- Drop and re-create the database schema on startup -->
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">false</property>
 
-		<!-- <property name="hbm2ddl.auto">create</property> -->
+        <!-- <property name="format_sql">true</property> -->
 
-		<property name="hbm2ddl.auto">update</property>
+        <!-- Drop and re-create the database schema on startup -->
 
-		<mapping class="org.msz.servlet.datatype.User" />
-		<mapping class="org.msz.servlet.datatype.UserRole" />
-		<mapping class="org.msz.servlet.datatype.PollOption" />
-		<mapping class="org.msz.servlet.datatype.PollGroup" />
-		<mapping class="org.msz.servlet.datatype.Subscription" />
-		<mapping class="org.msz.servlet.datatype.polls.SingleDecisionPoll" />
-		<mapping class="org.msz.servlet.datatype.polls.MultiDecisionPoll" />
-		<mapping class="org.msz.servlet.datatype.polls.SplitPointsPoll" />
-		<mapping class="org.msz.servlet.datatype.polls.AwardingPoll" />
-		<mapping class="org.msz.servlet.datatype.polls.OrderingPoll" />
-		<mapping class="org.msz.servlet.datatype.polls.FormTypePoll" />
-		<mapping class="org.msz.servlet.datatype.polls.CustomPoll" />
-		<mapping class="org.msz.servlet.datatype.polls.PublicPoll" />
-		<mapping class="org.msz.servlet.datatype.VoteOption" />
-		<mapping class="org.msz.servlet.datatype.Vote" />
+        <!-- <property name="hbm2ddl.auto">create</property> -->
 
-	</session-factory>
+        <property name="hbm2ddl.auto">update</property>
+
+        <mapping class="org.msz.servlet.datatype.User" />
+        <mapping class="org.msz.servlet.datatype.UserRole" />
+        <mapping class="org.msz.servlet.datatype.PollOption" />
+        <mapping class="org.msz.servlet.datatype.PollGroup" />
+        <mapping class="org.msz.servlet.datatype.Subscription" />
+        <mapping class="org.msz.servlet.datatype.polls.SingleDecisionPoll" />
+        <mapping class="org.msz.servlet.datatype.polls.MultiDecisionPoll" />
+        <mapping class="org.msz.servlet.datatype.polls.SplitPointsPoll" />
+        <mapping class="org.msz.servlet.datatype.polls.AwardingPoll" />
+        <mapping class="org.msz.servlet.datatype.polls.OrderingPoll" />
+        <mapping class="org.msz.servlet.datatype.polls.FormTypePoll" />
+        <mapping class="org.msz.servlet.datatype.polls.CustomPoll" />
+        <mapping class="org.msz.servlet.datatype.polls.PublicPoll" />
+        <mapping class="org.msz.servlet.datatype.VoteOption" />
+        <mapping class="org.msz.servlet.datatype.Vote" />
+
+    </session-factory>
 </hibernate-configuration>

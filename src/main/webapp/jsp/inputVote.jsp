@@ -5,6 +5,20 @@
 <%@page import="java.util.*"%>
 <%@page import="org.msz.datatype.Record"%>
 <%@page import="org.msz.servlet.util.PollsServletDAO"%>
+
+<%@include file="util.jsp"%>
+
+<%
+	  highlightStart = 0xEAEAEA;
+	
+	  PollsServletDAO dao = PollsServlet.getInstance(config).getPollsServletDAO();
+
+	  int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	  Poll poll = (Poll) dao.get(pollID, Poll.class);
+
+	  String pollURL = request.getRequestURL() + "?pollID=" + pollID;
+	%>
+
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -88,25 +102,23 @@
 	}
 </script>
 </head>
+<link rel="stylesheet" href="base.css" media="screen" />
 <body>
 
 	<%
-	  PollsServletDAO dao = PollsServletDAO.getInstance();
-
-	  int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
-	  Poll poll = (Poll) dao.get(pollID, Poll.class);
-	%>
-
-
-	<%
-	  String pollURL = request.getRequestURL() + "?pollID=" + pollID;
+	  if (session.getAttribute(HTTPRequestParamNames.USER_ID) != null)
+	  {
 	%>
 	<a href="<%=pollURL%>">Webc&iacute;m anon&iacute;m
 		szavaz&aacute;shoz:</a>
-	<br>
+
 	<input size="100" type="text" value="<%=pollURL%>">
+	<%
+	  }
+	%>
+
 	<p>
-	<form accept-charset="UTF-8" name="input" action="../PollsServlet"
+		<form accept-charset="UTF-8" name="input" action="../PollsServlet"
 		method="post">
 		<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
 			value="<%=PollsServlet.Command.saveVote%>"> <input
@@ -117,26 +129,25 @@
 		  if (session.getAttribute(HTTPRequestParamNames.USER_ID) == null)
 		  {
 		%>
-		Szavaz&oacute; email c&iacute;me: <input type="text"
+		Szavaz&oacute; email c&iacute;me (Nem k&ouml;telez&otilde; megadni): <input type="text"
 			name="<%=HTTPRequestParamNames.ANONYMOUS_VOTE%>">
 		<p>
 			<%
 			  }
-			%>
-		
-		<table width="100%" border="1" cellspacing="0" cellpadding="0">
+			%><table b order="0" cellspacing="0" cellpadding="0">
 
 			<jsp:include page="pollHeader.jsp" />
 
-			<tr>
+			<tr bgcolor="<%=highlight(request)%>">
 				<td>V&aacute;laszt&aacute;si lehet&otilde;s&eacute;gek:</td>
 				<td>
-					<!-- SplitPointsPoll --> <%
-   if (poll instanceof SplitPointsPoll)
-   {
- 		SplitPointsPoll splitPointsPoll = (SplitPointsPoll) poll;
- %> <input type="hidden" id="options" value="<%=poll.options.size()%>">
-					<table width="100%" border="0">
+					<!-- SplitPointsPoll --><%
+					  if (poll instanceof SplitPointsPoll)
+					  {
+							SplitPointsPoll splitPointsPoll = (SplitPointsPoll) poll;
+					%>
+		<input type="hidden" id="options" value="<%=poll.options.size()%>">
+	<table style="border: 1px solid black;" width="100%">
 						<tr>
 							<td width="70%">Felhaszn&aacute;lhat&oacute; &ouml;sszeg:</td>
 							<td width="30%"><label id="maxAmount"><%=splitPointsPoll.maxAmount%></label>
@@ -167,7 +178,7 @@
 						  });
 						%>
 						<!-- OrderingPoll -->
-						<table width="100%" border="0">
+						<table style="border: 1px solid black;" width="100%">
 							<%
 							  int httpIndex = 1;
 							  for (PollOption option : list)
@@ -180,8 +191,11 @@
 										  if (httpIndex == 1)
 										  {
 								%>
-								<input type='hidden' name='<%=HTTPRequestParamNames.OPTION_VALUE + 1%>' value='igen'>
-<%} %>
+								<input type='hidden'
+									name='<%=HTTPRequestParamNames.OPTION_VALUE + 1%>' value='igen'>
+								<%
+								  }
+								%>
 								<td><%=option.name%></td>
 								<td><input type='radio'
 									name='<%=HTTPRequestParamNames.OPTION_NAME + 1%>'
@@ -319,22 +333,30 @@
 				</td>
 			</tr>
 
-			<%
-			  if (session.getAttribute(HTTPRequestParamNames.USER_ID) != null)
-			  {
-			%>
-			<jsp:include page="statisticsDetails.jsp" />
-			<%
-			  }
-			%>
-
-			<tr bgcolor="#99FFCC">
+			<tr>
 				<td colspan="2">
 					<div align="center">
 						<input name="submit" type="submit" value="Ment&eacute;s">
 					</div>
 				</td>
 			</tr>
+
+			<%
+			  if (session.getAttribute(HTTPRequestParamNames.USER_ID) != null)
+			  {
+			%>
+			<jsp:include page="statisticsDetails.jsp" />
+
+			<tr>
+				<td colspan="2">
+					<div align="center">
+						<input name="submit" type="submit" value="Ment&eacute;s">
+					</div>
+				</td>
+			</tr>
+			<%
+			  }
+			%>
 		</table>
 		</td>
 		</tr>

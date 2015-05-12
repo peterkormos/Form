@@ -109,6 +109,7 @@ function checkData()
     </script>
 
 </head>
+<link rel="stylesheet" href="base.css" media="screen" />
 
 <body onload="initialize()" onunload="GUnload()">
 	<form accept-charset="UTF-8" action="../PollsServlet" method="post">

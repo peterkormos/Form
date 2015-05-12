@@ -1,0 +1,25 @@
+input , select
+{
+	border-radius: 5px; padding-left: 10px;
+	background: linear-gradient(rgb(235,235,235), white);
+}
+
+input[type="submit"]
+{
+	background: linear-gradient(rgba(0,150,0,0.3), white);
+}
+
+input:focus 
+{
+	border-color:#333; 
+	background: linear-gradient(rgba(100,100,200,0.3), white);
+}
+
+table
+{
+	box-shadow: 5px 5px 10px #888;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}

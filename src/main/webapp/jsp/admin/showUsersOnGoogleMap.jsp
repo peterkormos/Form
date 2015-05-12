@@ -1,10 +1,12 @@
-<%@page import="org.msz.servlet.*"%>
-<%@page import="org.msz.servlet.util.PollsServletDAO"%>
-<%@page import="org.msz.datatype.Record"%>
-<%@page import="org.msz.servlet.datatype.*"%>
 <%@page import="java.util.*"%>
-<%@page import="org.msz.servlet.datatype.Vote"%>
 <%@page import="java.io.File"%>
+
+<%@page import="org.msz.datatype.Record"%>
+<%@page import="org.msz.servlet.*"%>
+<%@page import="org.msz.servlet.datatype.*"%>
+<%@page import="org.msz.servlet.util.PollsServletDAO"%>
+<%@page import="org.msz.util.WebUtils"%>
+
 
 <%
   PollsServletDAO dao = PollsServletDAO.getInstance();
@@ -14,18 +16,13 @@
 %>
 
 
-<%@page import="org.msz.util.WebUtils"%><html>
+<html>
 <head>
 
 <script
 	src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAqev4fRnaiSo-XtAyyOdatRRO9qeUkRN7-Fvh2OLBEjwyQcLANhQ0UxuTtSFlxaQksGU210KhsRdkoA"
 	type="text/javascript">
 </script>
-
-<xscript
-	src="http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js"
-	type="text/javascript">
-</xscript>
 
 <script type="text/javascript">
 

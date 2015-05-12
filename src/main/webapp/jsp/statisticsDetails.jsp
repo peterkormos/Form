@@ -7,13 +7,18 @@
 <%@page import="java.util.*"%>
 <%@page import="org.msz.util.WebUtils"%>
 
+<%@include file="util.jsp"%>
+
 <%
-  PollsServletDAO dao = PollsServletDAO.getInstance();
+  highlightStart = 0xEAEAEA;
+
+  PollsServletDAO dao = PollsServlet.getInstance(config).getPollsServletDAO();
 
   int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
-
   Poll poll = (Poll) dao.get(pollID, Poll.class);
+%>
 
+<%
   List<Vote> votes = dao.getVotesForPoll(pollID);
 
   SortedMap<String, StatsEntry> stats = new TreeMap<String, StatsEntry>();
@@ -54,83 +59,75 @@
 		avg = avg / stats.size();
 %>
 
-<tr>
+<tr bgcolor="<%=highlight(request)%>">
 	<td>Eddigi szavazatok sz&aacute;ma:</td>
 	<td><%=votes.size()%></td>
 </tr>
 
-<tr bgcolor="#DDDDDD">
+<tr bgcolor="<%=highlight(request)%>">
 	<td>Szavazati statisztika:</td>
 	<td>
-		<table width="100%" border="1">
+		<table width="100%" style="border: 1px solid black;">
 			<tr>
+				<th width="38%">
+					<div align="left">Lehet&otilde;s&eacute;g</div>
+				</th>
+				<th width="100">
+					<div align="left">V&aacute;lasz</div>
+				</th>
+				<th width="150">
+					<div align="left">Szavaztok sz&aacute;ma</div>
+				</th>
+				<th width="400">
+					<div align="left">
+						Eloszl&aacute;s ( min: <img src='../images/red.jpg' width='10'
+							height='10'> max: <img src='../images/green.jpg' width='10'
+							height='10'> avg: <img src='../images/grey.jpg' width='10'
+							height='10'> )
+					</div>
+				</th>
+			</tr>
+			<%
+			  for (String key : stats.keySet())
+			  {
+					StatsEntry entry = stats.get(key);
+			%>
+			<tr>
+				<td><%=entry.option.name%></td>
+				<td><%=entry.option.value%></td>
+				<td><%=entry.count%></td>
 				<td>
+					<%
+					  if (min * 1.1 >= entry.count)
+							  out.println("<img src='../images/red.jpg' width='" + Math.max(1, (int) (entry.count * 100 / votes.size()))
+								  + "' height='10'>");
 
+							else if (max * 0.9 <= entry.count)
+							  out.println("<img src='../images/green.jpg' width='" + Math.max(1, (int) (entry.count * 100 / votes.size()))
+								  + "' height='10'>");
 
-					<table width="100%" border="0">
-						<tr>
-							<th width="38%">
-								<div align="left">Lehet&otilde;s&eacute;g</div>
-							</th>
-							<th width="100">
-								<div align="left">V&aacute;lasz</div>
-							</th>
-							<th width="150">
-								<div align="left">Szavaztok sz&aacute;ma</div>
-							</th>
-							<th width="180">
-								<div align="left">
-									Eloszl&aacute;s ( min: <img src='../images/red.jpg' width='10'
-										height='10'> max: <img src='../images/green.jpg'
-										width='10' height='10'> avg: <img
-										src='../images/grey.jpg' width='10' height='10'> )
-								</div>
-							</th>
-						</tr>
-						<%
-						  for (String key : stats.keySet())
-						  {
-								StatsEntry entry = stats.get(key);
-						%>
-						<tr>
-							<td><%=entry.option.name%></td>
-							<td><%=entry.option.value%></td>
-							<td><%=entry.count%></td>
-							<td>
-								<%
-								  if (min * 1.1 >= entry.count)
-										  out.println("<img src='../images/red.jpg' width='" + Math.max(1, (int) (entry.count * 100 / votes.size()))
-											  + "' height='10'>");
-
-										else if (max * 0.9 <= entry.count)
-										  out.println("<img src='../images/green.jpg' width='" + Math.max(1, (int) (entry.count * 100 / votes.size()))
-											  + "' height='10'>");
-
-										else if (avg * 0.9 <= entry.count && avg * 1.1 >= entry.count)
-										  out.println("<img src='../images/grey.jpg' width='" + Math.max(1, (int) (entry.count * 100 / votes.size()))
-											  + "' height='10'>");
-								%>
-							</td>
-						</tr>
-						<%
-						  }
-						%>
-					</table>
+							else if (avg * 0.9 <= entry.count && avg * 1.1 >= entry.count)
+							  out.println("<img src='../images/grey.jpg' width='" + Math.max(1, (int) (entry.count * 100 / votes.size()))
+								  + "' height='10'>");
+					%>
 				</td>
 			</tr>
+			<%
+			  }
+			%>
 		</table>
 	</td>
 </tr>
 
-<tr>
+<%
+  if (poll instanceof OrderingPoll)
+  {
+		Map<String, String> pollStats = ((OrderingPoll) poll).getPollSpecificStatistics(votes);
+%>
+<tr bgcolor="<%=highlight(request)%>">
 	<td>Szavazat specifikus statisztika:</td>
 	<td>
-		<%
-		  if (poll instanceof OrderingPoll)
-		  {
-				Map<String, String> pollStats = ((OrderingPoll) poll).getPollSpecificStatistics(votes);
-		%>
-		<table width="100%" border="1">
+		<table width="100%" border="0">
 			<%
 			  for (String key : pollStats.keySet())
 					{
@@ -142,8 +139,9 @@
 			<%
 			  }
 			%>
-		</table> <%
-   }
- %>
+		</table>
 	</td>
 </tr>
+<%
+  }
+%>

@@ -12,8 +12,7 @@
 <%@include file="util.jsp"%>
 
 <%
-  highlightStart = 0xE0E0E0;
-  PollsServletDAO dao = PollsServletDAO.getInstance();
+  PollsServletDAO dao = PollsServlet.getInstance(config).getPollsServletDAO();
   int userID = Integer.parseInt((String) session.getAttribute(HTTPRequestParamNames.USER_ID));
   User user = (User) dao.get(userID, User.class);
 %>
@@ -26,6 +25,7 @@
 	}
 </script>
 </head>
+<link rel="stylesheet" href="base.css" media="screen" />
 <body>
 	<form accept-charset="UTF-8" action="../PollsServlet" method="POST">
 		<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
@@ -65,10 +65,7 @@
 			  "Nyilv&aacute;nos szavaz&aacute;sok" };
 	%>
 	<br>
-	<table width="100%" border="1" cellspacing="0" cellpadding="0">
-		<tr>
-			<td>
-				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<table border="0">
 					<tr valign="top">
 						<td width="350"><strong>Szavaz&aacute;s</strong></td>
 						<td>&nbsp;</td>
@@ -77,7 +74,7 @@
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 					</tr>
-					<tr valign="top">
+					<tr valign="top" bgcolor="<%=highlight(request)%>">
 						<td>&Uacute;j szavaz&aacute;s:</td>
 						<td>
 							<form accept-charset="UTF-8" action="inputPoll.jsp" method="POST">
@@ -86,12 +83,12 @@
 							</form>
 						</td>
 					</tr>
-					<tr valign="top" bgcolor="<%=highlight()%>">
+					<tr valign="top" bgcolor="<%=highlight(request)%>">
 						<td>Szavaz&aacute;s:</td>
 						<td>
 							<form accept-charset="UTF-8" action="inputVote.jsp" method="POST">
 								<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>">
-								Szavaz&aacute;s: <select name="<%=HTTPRequestParamNames.POLL_ID%>">
+								<select name="<%=HTTPRequestParamNames.POLL_ID%>">
 									<%
 									  for (int i = 0; i < allVisiblePolls.length; i++)
 									  {
@@ -131,11 +128,11 @@
 							</form>
 						</td>
 					</tr>
-					<tr valign="top" bgcolor="<%=highlight()%>">
+					<tr valign="top" bgcolor="<%=highlight(request)%>">
 						<td>Szavaz&aacute;s m&oacute;dos&iacute;t&aacute;sa:</td>
 						<td>
 							<form accept-charset="UTF-8" action="inputPoll.jsp" method="POST">
-								Szavaz&aacute;s: <select name="<%=HTTPRequestParamNames.POLL_ID%>">
+								 <select name="<%=HTTPRequestParamNames.POLL_ID%>">
 									<%
 									  for (Record record : user.getOwnedPolls())
 									  {
@@ -149,13 +146,13 @@
 							</form>
 						</td>
 					</tr>
-					<tr valign="top" bgcolor="<%=highlight()%>">
+					<tr valign="top" bgcolor="<%=highlight(request)%>">
 						<td>Szavaz&aacute;s eredm&eacute;nye:</td>
 						<td>
 							<form accept-charset="UTF-8" action="statistics.jsp"
 								method="POST">
 								<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>">
-								Szavaz&aacute;s: <select name="<%=HTTPRequestParamNames.POLL_ID%>">
+								 <select name="<%=HTTPRequestParamNames.POLL_ID%>">
 									<%
 									  Set<Record> votedPolls = new HashSet<Record>();
 									  votedPolls.addAll(user.getOwnedPolls());
@@ -174,7 +171,7 @@
 							</form>
 						</td>
 					</tr>
-					<tr valign="top" bgcolor="<%=highlight()%>">
+					<tr valign="top" bgcolor="<%=highlight(request)%>">
 						<td>Email &eacute;rtes&iacute;t&otilde; k&eacute;r&eacute;se
 							ha v&aacute;lasz &eacute;rkezik:</td>
 						<td>
@@ -182,7 +179,7 @@
 								method="POST">
 								<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
 									value="<%=PollsServlet.Command.subscribeToPoll%>">
-								Szavaz&aacute;s: <select name="<%=HTTPRequestParamNames.POLL_ID%>">
+								<select name="<%=HTTPRequestParamNames.POLL_ID%>">
 									<%
 									  for (int i = 0; i < allVisiblePolls.length; i++)
 									  {
@@ -222,7 +219,7 @@
 							</form>
 						</td>
 					</tr>
-					<tr valign="top" bgcolor="<%=highlight()%>">
+					<tr valign="top" bgcolor="<%=highlight(request)%>">
 						<td>Leiratkoz&aacute;s az email
 							&eacute;rtes&iacute;t&otilde;r&otilde;l:</td>
 						<td>
@@ -230,7 +227,7 @@
 								method="POST">
 								<input type="hidden" name="<%=HTTPRequestParamNames.COMMAND%>"
 									value="<%=PollsServlet.Command.unsubscribeFromPoll%>">
-								Szavaz&aacute;s: <select name="<%=HTTPRequestParamNames.POLL_ID%>">
+								 <select name="<%=HTTPRequestParamNames.POLL_ID%>">
 									<%
 									  for (Subscription subscription : dao.getSubscriptionsForUser(userID))
 									  {
@@ -246,9 +243,6 @@
 								</select> <input type="button" onClick="this.parentNode.submit();"
 									value="Feliratkoz&aacute;s">
 							</form>
-						</td>
-					</tr>
-				</table>
 			</td>
 		</tr>
 	</table>

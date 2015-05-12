@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -41,10 +40,12 @@ public final class PollsServlet extends HttpServlet
 {
   private static final long serialVersionUID = 981050873369771271L;
 
-  private Logger logger = Logger.getLogger(getClass());
+  private final Logger logger = Logger.getLogger(getClass());
+  private static PollsServlet instance;
   PollsServletDAO dao;
   public static Properties servletConfig;
   public static Properties messages;
+
   private String emailBody;
 
   public static enum Command
@@ -54,6 +55,7 @@ public final class PollsServlet extends HttpServlet
 
   public static final String DATE_PATTERN = "yyyy-MM-dd";
 
+  @Override
   public void init(ServletConfig config) throws ServletException
   {
 	try
@@ -71,12 +73,16 @@ public final class PollsServlet extends HttpServlet
 
 	  dao = new PollsServletDAO(config.getServletContext().getResource("/WEB-INF/conf/hibernate.cfg.xml"));
 	}
-	catch (Exception e)
+	catch (final Exception e)
 	{
 	  if (logger != null)
+	  {
 		logger.fatal("init(): ", e);
+	  }
 	  else
+	  {
 		e.printStackTrace();
+	  }
 
 	  throw new UnavailableException(e.getMessage() + " " + e.toString());
 	}
@@ -84,32 +90,34 @@ public final class PollsServlet extends HttpServlet
 
   private void saveVote(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	final int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
 
 	int userID;
 	try
 	{
 	  userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
 	}
-	catch (Exception e1)
+	catch (final Exception e1)
 	{
 	  // anonymous vote
 	  String anonymousUser = WebUtils.getOptionalParameter(request, HTTPRequestParamNames.ANONYMOUS_VOTE);
 	  if (anonymousUser == null || anonymousUser.trim().length() == 0)
+	  {
 		anonymousUser = HTTPRequestParamNames.ANONYMOUS_VOTE + System.currentTimeMillis();
+	  }
 	  try
 	  {
-		User user = dao.login(anonymousUser, HTTPRequestParamNames.NO_PASSWORD);
+		final User user = dao.login(anonymousUser, HTTPRequestParamNames.NO_PASSWORD);
 		userID = user.id;
 	  }
-	  catch (Exception e)
+	  catch (final Exception e)
 	  {
 		userID = dao.getNextID(User.class);
 		dao.save(new User(userID, anonymousUser, HTTPRequestParamNames.NO_PASSWORD, true, null, 0, 0));
 	  }
 	}
 
-	Poll poll = getPoll(pollID);
+	final Poll poll = getPoll(pollID);
 	checkPollRequest(request, poll, userID);
 
 	// String voteClass = WebUtils.getParameter(request, VOTE_CLASS);
@@ -119,7 +127,7 @@ public final class PollsServlet extends HttpServlet
 	  vote = dao.getVote(userID, pollID);
 	  vote.options.clear();
 	}
-	catch (Exception e)
+	catch (final Exception e)
 	{
 	  vote = new Vote();
 	  vote.id = dao.getNextID(Vote.class);
@@ -132,19 +140,19 @@ public final class PollsServlet extends HttpServlet
 
 	dao.save(vote);
 
-	List<Subscription> subscriptions = dao.getSubscriptionsForPoll(poll.id);
+	final List<Subscription> subscriptions = dao.getSubscriptionsForPoll(poll.id);
 	if (!subscriptions.isEmpty())
 	{
-	  String message = readURL(request, poll.id);
+	  final String message = readURL(request, poll.id);
 
-	  for (Subscription subscription : subscriptions)
+	  for (final Subscription subscription : subscriptions)
 	  {
 		sendEmail(subscription.user.id, messages.getProperty("email.type.saveVote"), messages.getProperty("new.vote") + "<p>"
 		    + message);
 	  }
 	}
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null && session.getAttribute(HTTPRequestParamNames.USER_ID) != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("save.vote"));
@@ -165,18 +173,18 @@ public final class PollsServlet extends HttpServlet
 
   private String readURL(HttpServletRequest request, int pollID) throws Exception
   {
-	String url = getPollURL(request, pollID);
+	final String url = getPollURL(request, pollID);
 	String message;
 	try
 	{
 	  message = Utils.readURL(url);
 	  return message;
 	}
-	catch (Exception e)
+	catch (final Exception e)
 	{
 	  logger.error("!!! readURL(): ", e);
 
-	  StringBuilder errorMessage = new StringBuilder();
+	  final StringBuilder errorMessage = new StringBuilder();
 
 	  errorMessage.append("<table width='100%' border='0' cellspacing='0' cellpadding='0'>\n");
 	  errorMessage.append("<tr>\n");
@@ -193,7 +201,7 @@ public final class PollsServlet extends HttpServlet
 
   private void savePoll(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
+	final int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
 
 	Poll poll = null;
 	int pollID = 0;
@@ -205,7 +213,7 @@ public final class PollsServlet extends HttpServlet
 
 	  if (!poll.getClass().equals(Class.forName(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_CLASS))))
 	  {
-		Poll newPoll = (Poll) Class.forName(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_CLASS)).newInstance();
+		final Poll newPoll = (Poll) Class.forName(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_CLASS)).newInstance();
 		newPoll.id = pollID;
 
 		newPoll.update(poll);
@@ -215,7 +223,7 @@ public final class PollsServlet extends HttpServlet
 		dao.save(poll);
 	  }
 	}
-	catch (Exception e)
+	catch (final Exception e)
 	{
 	  // new
 	  poll = (Poll) Class.forName(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_CLASS)).newInstance();
@@ -223,23 +231,26 @@ public final class PollsServlet extends HttpServlet
 	  poll.setOwnerID(userID);
 	}
 
+	addDetails(request, poll);
 	checkPollRequest(request, poll, userID);
 
-	addDetails(request, poll);
-
-	PublicPoll publicPoll = dao.getPublicPoll(poll.id);
+	final PublicPoll publicPoll = dao.getPublicPoll(poll.id);
 
 	if (WebUtils.convertToBoolean(WebUtils.getOptionalParameter(request, HTTPRequestParamNames.PUBLIC_POLL)))
 	{
 	  if (publicPoll == null)
+	  {
 		dao.save(new PublicPoll(dao.getNextID(PublicPoll.class), poll));
+	  }
 	}
 	else if (publicPoll != null)
+	{
 	  dao.delete(publicPoll.id, PublicPoll.class);
+	}
 
 	if (pollID == 0)
 	{
-	  User user = (User) dao.get(userID, User.class);
+	  final User user = (User) dao.get(userID, User.class);
 	  user.getOwnedPolls().add(poll);
 	  logger.debug("savePoll(): " + user);
 	  dao.save(user);
@@ -251,7 +262,7 @@ public final class PollsServlet extends HttpServlet
 	  dao.merge(poll);
 	}
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("save.vote"));
@@ -268,9 +279,11 @@ public final class PollsServlet extends HttpServlet
 	{
 	  poll.endDate = WebUtils.convertToDate(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ENDDATE), DATE_PATTERN);
 	  if (poll.endDate == 0)
+	  {
 		poll.endDate = Long.MAX_VALUE;
+	  }
 	}
-	catch (Exception e)
+	catch (final Exception e)
 	{
 	  poll.endDate = Long.MAX_VALUE;
 	}
@@ -282,12 +295,12 @@ public final class PollsServlet extends HttpServlet
 
 	if (poll instanceof SplitPointsPoll)
 	{
-	  SplitPointsPoll splitPointsPoll = (SplitPointsPoll) poll;
+	  final SplitPointsPoll splitPointsPoll = (SplitPointsPoll) poll;
 	  try
 	  {
 		splitPointsPoll.maxAmount = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.MAX_AMOUNT));
 	  }
-	  catch (Exception e)
+	  catch (final Exception e)
 	  {
 		logger.info("addDetail(): ", e);
 		throw new Exception(messages.getProperty("max.amount.not.set"));
@@ -297,12 +310,12 @@ public final class PollsServlet extends HttpServlet
 	}
 	else if (poll instanceof AwardingPoll)
 	{
-	  AwardingPoll awardingPoll = (AwardingPoll) poll;
+	  final AwardingPoll awardingPoll = (AwardingPoll) poll;
 	  try
 	  {
 		awardingPoll.maxAmount = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.MAX_AMOUNT));
 	  }
-	  catch (Exception e)
+	  catch (final Exception e)
 	  {
 		logger.info("addDetail(): ", e);
 		throw new Exception(messages.getProperty("max.amount.not.set"));
@@ -322,39 +335,45 @@ public final class PollsServlet extends HttpServlet
 	  int httpIndex = 1;
 	  while (true)
 	  {
-		String paramName = WebUtils.getParameter(request, HTTPRequestParamNames.OPTION_NAME + httpIndex);
+		final String paramName = WebUtils.getParameter(request, HTTPRequestParamNames.OPTION_NAME + httpIndex);
 
 		// System.out.println("paramName: " + paramName + " paramValue:
 		// "
 		// + paramValue + " httpIndex: " + httpIndex);
 
 		if (!paramName.isEmpty())
+		{
 		  try
 		  {
 			Record option;
 
 			if (optionsBag instanceof Poll)
+			{
 			  option = new PollOption(index++, paramName, WebUtils.getOptionalParameter(request,
 				  HTTPRequestParamNames.OPTION_VALUE + httpIndex), optionsBag.getId(), WebUtils.getOptionalParameter(request,
 				  HTTPRequestParamNames.OPTION_TYPE + httpIndex));
+			}
 			else
+			{
 			  option = new VoteOption(index++, paramName, WebUtils.getParameter(request, HTTPRequestParamNames.OPTION_VALUE
 				  + httpIndex), optionsBag.getId());
+			}
 
 			optionsBag.getOptions().add(option);
 
 		  }
-		  catch (Exception e)
+		  catch (final Exception e)
 		  {
 			e.printStackTrace();
 			// checkbox eseten nem biztos hogy megjon a
 			// optionvalue parameter.
 		  }
+		}
 
 		httpIndex++;
 	  }
 	}
-	catch (Exception e)
+	catch (final Exception e)
 	{
 
 	}
@@ -364,42 +383,46 @@ public final class PollsServlet extends HttpServlet
 
   private void addPollToGroup(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
-	Poll poll = getPoll(pollID);
+	final int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	final Poll poll = getPoll(pollID);
 
-	Integer pollGroupID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_GROUP_ID));
+	final Integer pollGroupID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_GROUP_ID));
 
 	dao.deletePublicFlag(pollID);
 	poll.setGroupID(pollGroupID);
 
 	dao.merge(poll);
 
-	String message = readURL(request, pollID);
+	final String message = readURL(request, pollID);
 
-	for (int userID : dao.getUsersInGroup(pollGroupID))
+	for (final int userID : dao.getUsersInGroup(pollGroupID))
+	{
 	  sendEmail(userID, messages.getProperty("email.type.addPollToGroup"), message);
+	}
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
+	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("added.poll.to.group"));
+	}
 	redirectToMainPage(response);
   }
 
   private void addUserToGroup(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
 
-	List<Integer> userIDs = new LinkedList<Integer>();
+	final List<Integer> userIDs = new LinkedList<Integer>();
 
-	StringTokenizer st = new StringTokenizer(WebUtils.getParameter(request, HTTPRequestParamNames.SUBSCRIBE_USER_ID), ",");
+	final StringTokenizer st = new StringTokenizer(WebUtils.getParameter(request, HTTPRequestParamNames.SUBSCRIBE_USER_ID), ",");
 
-	Set<Record> users = dao.getAll(User.class);
-	List<String> notFoundUsers = new LinkedList<String>();
+	final Set<Record> users = dao.getAll(User.class);
+	final List<String> notFoundUsers = new LinkedList<String>();
 	while (st.hasMoreTokens())
 	{
-	  String emailAddress = st.nextToken().trim();
+	  final String emailAddress = st.nextToken().trim();
 
 	  boolean found = false;
-	  for (Record user : users)
+	  for (final Record user : users)
 	  {
 		if (emailAddress.equals(((User) user).emailAddress))
 		{
@@ -409,19 +432,21 @@ public final class PollsServlet extends HttpServlet
 		}
 	  }
 	  if (!found)
+	  {
 		notFoundUsers.add(emailAddress);
+	  }
 	}
 
-	Integer pollGroupID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_GROUP_ID));
-	PollGroup pollGroup = (PollGroup) dao.get(pollGroupID, PollGroup.class);
+	final Integer pollGroupID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_GROUP_ID));
+	final PollGroup pollGroup = (PollGroup) dao.get(pollGroupID, PollGroup.class);
 
-	List<String> addedEmails = new LinkedList<String>();
-	for (int userID : userIDs)
+	final List<String> addedEmails = new LinkedList<String>();
+	for (final int userID : userIDs)
 	{
-	  User user = (User) dao.get(userID, User.class);
+	  final User user = (User) dao.get(userID, User.class);
 
 	  boolean found = false;
-	  for (PollGroup usersPollGroup : user.getPollGroups())
+	  for (final PollGroup usersPollGroup : user.getPollGroups())
 	  {
 		if (usersPollGroup.id == pollGroupID)
 		{
@@ -431,74 +456,86 @@ public final class PollsServlet extends HttpServlet
 	  }
 
 	  if (!found)
+	  {
 		user.getPollGroups().add(pollGroup);
+	  }
 
 	  logger.debug("addUserToPoll(): " + user);
 	  dao.merge(user);
 	  addedEmails.add(user.emailAddress);
 	}
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
+	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("added.users.to.group")
 		  + addedEmails
 
 		  + (notFoundUsers.isEmpty() ? "" : "<p>" + messages.getProperty("not.found.users") + notFoundUsers));
+	}
 	redirectToMainPage(response);
   }
 
   private void usersInGroup(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	Integer pollGroupID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_GROUP_ID));
+	final Integer pollGroupID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_GROUP_ID));
 
-	LinkedList<String> addedEmails = new LinkedList<String>();
+	final LinkedList<String> addedEmails = new LinkedList<String>();
 
-	for (int userID : dao.getUsersInGroup(pollGroupID))
+	for (final int userID : dao.getUsersInGroup(pollGroupID))
+	{
 	  addedEmails.add(((User) dao.get(userID, User.class)).emailAddress);
+	}
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
+	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("added.users.to.group")
 		  + addedEmails);
+	}
 	redirectToMainPage(response);
   }
 
   public static String getPollURL(HttpServletRequest request, int pollID) throws Exception
   {
-	StringBuffer requestURL = request.getRequestURL();
+	final StringBuffer requestURL = request.getRequestURL();
 
 	return requestURL.substring(0, requestURL.lastIndexOf("/")) + "/jsp/inputVote.jsp" + "?pollID=" + pollID;
   }
 
   private void addOption(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	final int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
 
-	Poll poll = getPoll(pollID);
-	int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
+	final Poll poll = getPoll(pollID);
+	final int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
 	checkPollRequest(request, poll, userID);
 
 	addOptions(request, poll);
 
 	dao.save(poll);
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
+	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("save.option"));
+	}
 	redirectToMainPage(response);
   }
 
   private void login(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	String emailAddress = WebUtils.getParameter(request, HTTPRequestParamNames.USER_EMAIL_ADDRESS);
-	String password = WebUtils.getParameter(request, HTTPRequestParamNames.USER_PASSWORD);
+	final String emailAddress = WebUtils.getParameter(request, HTTPRequestParamNames.USER_EMAIL_ADDRESS);
+	final String password = WebUtils.getParameter(request, HTTPRequestParamNames.USER_PASSWORD);
 
-	User user = dao.login(emailAddress, password);
+	final User user = dao.login(emailAddress, password);
 
 	if (!user.enabled)
+	{
 	  throw new Exception(messages.getProperty("user.not.enabled"));
+	}
 
-	HttpSession session = WebUtils.getHttpSession(request, true);
+	final HttpSession session = WebUtils.getHttpSession(request, true);
 	session.setAttribute(HTTPRequestParamNames.USER_ID, String.valueOf(user.id));
 	session.removeAttribute(HTTPRequestParamNames.POLL_ID);
 	session.removeAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION);
@@ -508,13 +545,13 @@ public final class PollsServlet extends HttpServlet
 
   private void saveUser(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	String emailAddress = WebUtils.getParameter(request, HTTPRequestParamNames.USER_EMAIL_ADDRESS);
-	String password = WebUtils.getParameter(request, HTTPRequestParamNames.USER_PASSWORD);
-	String address = WebUtils.getParameter(request, HTTPRequestParamNames.USER_ADDRESS);
-	double lat = Double.parseDouble(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ADDRESS_LAT));
-	double lng = Double.parseDouble(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ADDRESS_LNG));
+	final String emailAddress = WebUtils.getParameter(request, HTTPRequestParamNames.USER_EMAIL_ADDRESS);
+	final String password = WebUtils.getParameter(request, HTTPRequestParamNames.USER_PASSWORD);
+	final String address = WebUtils.getParameter(request, HTTPRequestParamNames.USER_ADDRESS);
+	final double lat = Double.parseDouble(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ADDRESS_LAT));
+	final double lng = Double.parseDouble(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ADDRESS_LNG));
 
-	String userID = WebUtils.getOptionalParameter(request, HTTPRequestParamNames.USER_ID);
+	final String userID = WebUtils.getOptionalParameter(request, HTTPRequestParamNames.USER_ID);
 
 	// register
 	if (userID == null)
@@ -526,7 +563,7 @@ public final class PollsServlet extends HttpServlet
 	  }
 	  else
 	  {
-		User user = new User(dao.getNextID(User.class), emailAddress, password, false, address, lat, lng);
+		final User user = new User(dao.getNextID(User.class), emailAddress, password, false, address, lat, lng);
 
 		dao.save(user);
 
@@ -538,11 +575,11 @@ public final class PollsServlet extends HttpServlet
 	}
 	else
 	{
-	  User user = (User) dao.get(Integer.parseInt(userID), User.class);
+	  final User user = (User) dao.get(Integer.parseInt(userID), User.class);
 	  user.update(new User(user.id, emailAddress, password, user.enabled, address, lat, lng));
 	  dao.merge(user);
 
-	  HttpSession session = WebUtils.getHttpSession(request, false);
+	  final HttpSession session = WebUtils.getHttpSession(request, false);
 	  if (session != null)
 	  {
 		session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("modify.user.data"));
@@ -557,15 +594,18 @@ public final class PollsServlet extends HttpServlet
 	response.getOutputStream().write(message == null ? "null".getBytes() : message.getBytes());
   }
 
+  @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
 	try
 	{
 	  if (request.getCharacterEncoding() == null)
+	  {
 		request.setCharacterEncoding("UTF-8");
+	  }
 
-	  long startTime = System.currentTimeMillis();
-	  String command = WebUtils.getParameter(request, HTTPRequestParamNames.COMMAND);
+	  final long startTime = System.currentTimeMillis();
+	  final String command = WebUtils.getParameter(request, HTTPRequestParamNames.COMMAND);
 
 	  logger.debug("doPost(): request arrived. command: " + command + " request.getCharacterEncoding: "
 		  + request.getCharacterEncoding() + " request paramters: " + request.getParameterMap().keySet() + " IP: "
@@ -640,7 +680,7 @@ public final class PollsServlet extends HttpServlet
 		  + (System.currentTimeMillis() - startTime));
 
 	}
-	catch (Exception e)
+	catch (final Exception e)
 	{
 	  logger.error("doPost(): ", e);
 	  writeResponse(response, e.getMessage());
@@ -649,14 +689,14 @@ public final class PollsServlet extends HttpServlet
 
   private void subscribeToPoll(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	final int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
 
-	int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
-	User user = ((User) dao.get(userID, User.class));
+	final int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
+	final User user = ((User) dao.get(userID, User.class));
 
 	dao.save(new Subscription(dao.getNextID(Subscription.class), pollID, user));
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("subscribe.to.poll"));
@@ -666,13 +706,13 @@ public final class PollsServlet extends HttpServlet
 
   private void unsubscribeFromPoll(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	final int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
 
-	int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
+	final int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
 
-	List<Subscription> subscriptions = dao.getSubscriptionsForUser(userID);
+	final List<Subscription> subscriptions = dao.getSubscriptionsForUser(userID);
 
-	for (Subscription subscription : subscriptions)
+	for (final Subscription subscription : subscriptions)
 	{
 	  if (subscription.pollID == pollID)
 	  {
@@ -681,7 +721,7 @@ public final class PollsServlet extends HttpServlet
 	  }
 	}
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("unsubscribe.from.poll"));
@@ -691,24 +731,26 @@ public final class PollsServlet extends HttpServlet
 
   private void logout(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
+	{
 	  session.invalidate();
+	}
 	response.sendRedirect("index.html");
   }
 
   private void saveGroup(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
-	User user = ((User) dao.get(userID, User.class));
+	final int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
+	final User user = ((User) dao.get(userID, User.class));
 
-	PollGroup pollGroup = new PollGroup(dao.getNextID(PollGroup.class), WebUtils.getParameter(request,
+	final PollGroup pollGroup = new PollGroup(dao.getNextID(PollGroup.class), WebUtils.getParameter(request,
 	    HTTPRequestParamNames.GROUP_NAME));
 	user.getPollGroups().add(pollGroup);
 
 	dao.merge(user);
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("save.group"));
@@ -718,15 +760,17 @@ public final class PollsServlet extends HttpServlet
 
   private void sendEmailsToGroup(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
-	Poll poll = getPoll(pollID);
+	final int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	final Poll poll = getPoll(pollID);
 
-	String message = readURL(request, pollID);
+	final String message = readURL(request, pollID);
 
-	for (int userID : dao.getUsersInGroup(poll.groupID))
+	for (final int userID : dao.getUsersInGroup(poll.groupID))
+	{
 	  sendEmail(userID, messages.getProperty("email.type.sendEmailsToGroup"), message);
+	}
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("sent.email"));
@@ -743,14 +787,14 @@ public final class PollsServlet extends HttpServlet
 
   private void assignPoll(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	final int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
 
-	Poll poll = (Poll) dao.get(pollID, Poll.class);
+	final Poll poll = (Poll) dao.get(pollID, Poll.class);
 	poll.ownerID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
 
 	dao.update(poll);
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("assign.poll"));
@@ -760,12 +804,12 @@ public final class PollsServlet extends HttpServlet
 
   private void deletePoll(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
-	int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
+	final int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	final int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
 
-	List<Subscription> subscriptions = dao.getSubscriptionsForUser(userID);
+	final List<Subscription> subscriptions = dao.getSubscriptionsForUser(userID);
 
-	for (Subscription subscription : subscriptions)
+	for (final Subscription subscription : subscriptions)
 	{
 	  if (subscription.pollID == pollID)
 	  {
@@ -774,22 +818,28 @@ public final class PollsServlet extends HttpServlet
 	  }
 	}
 
-	PublicPoll publicPoll = dao.getPublicPoll(pollID);
+	final PublicPoll publicPoll = dao.getPublicPoll(pollID);
 	if (publicPoll != null)
+	{
 	  dao.delete(publicPoll.id, PublicPoll.class);
+	}
 	else
+	{
 	  dao.delete(pollID, Poll.class);
+	}
 
 	try
 	{
-	  for (Vote vote : dao.getVotesForPoll(pollID))
+	  for (final Vote vote : dao.getVotesForPoll(pollID))
+	  {
 		dao.delete(vote.id, Vote.class);
+	  }
 	}
-	catch (Exception e)
+	catch (final Exception e)
 	{
 	}
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("delete.poll"));
@@ -799,22 +849,22 @@ public final class PollsServlet extends HttpServlet
 
   private void deleteVote(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
-	String sUserID = WebUtils.getOptionalParameter(request, HTTPRequestParamNames.DELETED_USER_ID);
+	final int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	final String sUserID = WebUtils.getOptionalParameter(request, HTTPRequestParamNames.DELETED_USER_ID);
 
-	int userID = sUserID == null ? Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID)) : Integer
-	    .parseInt(sUserID);
+	final int userID = sUserID == null ? Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID))
+	    : Integer.parseInt(sUserID);
 
 	try
 	{
-	  Vote vote = dao.getVote(userID, pollID);
+	  final Vote vote = dao.getVote(userID, pollID);
 	  dao.delete(vote.id, Vote.class);
 	}
-	catch (Exception e)
+	catch (final Exception e)
 	{
 	}
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("delete.vote"));
@@ -824,34 +874,44 @@ public final class PollsServlet extends HttpServlet
 
   private void deleteUser(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.DELETED_USER_ID));
-	User user = (User) dao.get(userID, User.class);
+	final int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.DELETED_USER_ID));
+	final User user = (User) dao.get(userID, User.class);
 
-	for (Vote vote : dao.getVotesForUser(userID))
-	  dao.delete(vote.id, Vote.class);
-
-	List<Subscription> subscriptions = dao.getSubscriptionsForUser(userID);
-
-	for (Subscription subscription : subscriptions)
-	  dao.delete(subscription.id, Subscription.class);
-
-	for (Poll poll : user.getOwnedPolls())
+	for (final Vote vote : dao.getVotesForUser(userID))
 	{
-	  for (Vote vote : dao.getVotesForPoll(poll.id))
-		dao.delete(vote.id, Vote.class);
+	  dao.delete(vote.id, Vote.class);
+	}
 
-	  PublicPoll publicPoll = dao.getPublicPoll(poll.id);
+	final List<Subscription> subscriptions = dao.getSubscriptionsForUser(userID);
+
+	for (final Subscription subscription : subscriptions)
+	{
+	  dao.delete(subscription.id, Subscription.class);
+	}
+
+	for (final Poll poll : user.getOwnedPolls())
+	{
+	  for (final Vote vote : dao.getVotesForPoll(poll.id))
+	  {
+		dao.delete(vote.id, Vote.class);
+	  }
+
+	  final PublicPoll publicPoll = dao.getPublicPoll(poll.id);
 
 	  if (publicPoll != null)
+	  {
 		dao.delete(publicPoll.id, PublicPoll.class);
+	  }
 	  else
+	  {
 		dao.delete(poll.id, Poll.class);
+	  }
 
 	}
 
 	dao.delete(userID, User.class);
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("delete.user"));
@@ -861,17 +921,19 @@ public final class PollsServlet extends HttpServlet
 
   private void deletePollOption(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
-	Poll poll = getPoll(pollID);
+	final int pollID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_ID));
+	final Poll poll = getPoll(pollID);
 
-	Integer pollOptionID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_OPTION_ID));
-	for (PollOption option : poll.getOptions())
+	final Integer pollOptionID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.POLL_OPTION_ID));
+	for (final PollOption option : poll.getOptions())
 	{
 	  if (option.id == pollOptionID)
+	  {
 		dao.delete(pollOptionID, PollOption.class);
+	  }
 	}
 
-	HttpSession session = WebUtils.getHttpSession(request, false);
+	final HttpSession session = WebUtils.getHttpSession(request, false);
 	if (session != null)
 	{
 	  session.setAttribute(HTTPRequestParamNames.MESSAGE_IN_HTTPSESSION, messages.getProperty("delete.option"));
@@ -886,9 +948,9 @@ public final class PollsServlet extends HttpServlet
 
   private void activate(HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-	int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
+	final int userID = Integer.parseInt(WebUtils.getParameter(request, HTTPRequestParamNames.USER_ID));
 
-	User user = (User) dao.get(userID, User.class);
+	final User user = (User) dao.get(userID, User.class);
 	user.enabled = true;
 
 	dao.save(user);
@@ -896,6 +958,7 @@ public final class PollsServlet extends HttpServlet
 	writeResponse(response, messages.getProperty("activation.successful"));
   }
 
+  @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
 	doPost(request, response);
@@ -904,26 +967,32 @@ public final class PollsServlet extends HttpServlet
   public void checkPollRequest(HttpServletRequest request, Poll poll, int userID) throws Exception
   {
 	if (poll.endDate != 0 && poll.endDate < System.currentTimeMillis())
+	{
 	  throw new Exception(messages.getProperty("poll.endDate"));
+	}
 
-	Command command = Command.valueOf(WebUtils.getParameter(request, HTTPRequestParamNames.COMMAND));
+	final Command command = Command.valueOf(WebUtils.getParameter(request, HTTPRequestParamNames.COMMAND));
 
 	if (Command.addOption.equals(command) && !poll.userCanAddEntry)
+	{
 	  throw new Exception("user cannot add entry!");
+	}
 
 	try
 	{
 	  if (Command.saveVote.equals(command) && !poll.userCanResubmit && dao.getVote(userID, poll.id) != null)
+	  {
 		throw new Exception(messages.getProperty("user.cannot.resubmit"));
+	  }
 	}
-	catch (Exception e)
+	catch (final Exception e)
 	{
 	}
   }
 
   public static LinkedList<Record> sort(Collection<Record> collection)
   {
-	LinkedList<Record> list = new LinkedList<Record>(collection);
+	final LinkedList<Record> list = new LinkedList<Record>(collection);
 	Collections.sort(list, new Comparator<Record>()
 	{
 
@@ -936,5 +1005,26 @@ public final class PollsServlet extends HttpServlet
 	});
 
 	return list;
+  }
+
+  public PollsServlet()
+  {
+	instance = this;
+  }
+
+  public static PollsServlet getInstance(ServletConfig config) throws Exception
+  {
+	if (instance == null)
+	{
+	  instance = new PollsServlet();
+	  instance.init(config);
+	}
+
+	return instance;
+  }
+
+  public PollsServletDAO getPollsServletDAO()
+  {
+	return dao;
   }
 }
